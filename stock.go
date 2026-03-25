@@ -126,3 +126,51 @@ func (c *Client) GetRealtimeStockRank(qryTp string) (*RealtimeItemRankResponse, 
 
 	return &res, nil
 }
+
+// StockMinuteChartRequest payload for querying minute chart data.
+type StockMinuteChartRequest struct {
+	StkCd      string `json:"stk_cd"`       // Stock code
+	TicScope   string `json:"tic_scope"`    // 1:1m, 3:3m, 5:5m, 10:10m, 15:15m, 30:30m, 45:45m, 60:60m
+	UpdStkpcTp string `json:"upd_stkpc_tp"` // 0 or 1
+	BaseDt     string `json:"base_dt"`      // YYYYMMDD (optional)
+}
+
+// StockMinutePole represents a single minute candle's data.
+type StockMinutePole struct {
+	CurPrc     string `json:"cur_prc"`      // Close price
+	TrdeQty    string `json:"trde_qty"`     // Trading volume
+	CntrTm     string `json:"cntr_tm"`      // Contract time (YYYYMMDDHHMMSS)
+	OpenPric   string `json:"open_pric"`    // Open price
+	HighPric   string `json:"high_pric"`    // High price
+	LowPric    string `json:"low_pric"`     // Low price
+	AccTrdeQty string `json:"acc_trde_qty"` // Accumulated trading volume
+	PredPre    string `json:"pred_pre"`     // Change from previous day
+	PredPreSig string `json:"pred_pre_sig"` // Change sign (1: Up limit, 2: Up, 3: Even, 4: Down limit, 5: Down)
+}
+
+// StockMinuteChartResponse contains a list of minute candles.
+type StockMinuteChartResponse struct {
+	StkCd              string            `json:"stk_cd"`
+	StkMinPoleChartQry []StockMinutePole `json:"stk_min_pole_chart_qry"`
+	ReturnCode         int               `json:"return_code"`
+	ReturnMsg          string            `json:"return_msg"`
+}
+
+// GetStockMinuteChart retrieves minute-level chart data for a specific stock.
+// ticScope: "1" (1m), "3" (3m), "5" (5m), "10" (10m), etc.
+// updStkpcTp: "0" (Standard) or "1" (Adjusted).
+// baseDt: Target date in YYYYMMDD format.
+// See Kiwoom API ID: ka10080
+func (c *Client) GetStockMinuteChart(req *StockMinuteChartRequest) (*StockMinuteChartResponse, error) {
+	httpReq, err := c.newRequest(http.MethodPost, "/api/dostk/chart", "ka10080", req)
+	if err != nil {
+		return nil, err
+	}
+
+	var res StockMinuteChartResponse
+	if err := c.do(httpReq, &res); err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
