@@ -72,6 +72,7 @@ When acting as an agent on this project, ensure:
 1.  **Rich Context**: Before implementing, check `kiwoom_api.txt` or related specifications to ensure field names and types are accurate.
 2.  **Self-Correction**: If you notice a pattern mismatch (e.g., inconsistent error naming), proactively fix it to align with the rest of the project.
 3.  **WOW Factor**: Don't just implement the minimum. Provide a helpful example or a robust test case that proves the implementation works.
+4.  **Documentation Maintenance**: Proactively update `AGENTS.md` and `README.md` when new patterns, features, or significant changes are introduced to keep the documentation in sync with the codebase.
 
 ---
 

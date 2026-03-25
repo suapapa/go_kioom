@@ -4,13 +4,9 @@
 
 `go_kioom` 은 키움증권 REST API 명세서에 맞춰 작성된 비공식 Golang 래퍼(Wrapper) 패키지입니다. 
 
-## 현재 구현된 기능
+## 구현 현황
 
-- **`au10001`**: 접근토큰 발급 (`IssueToken`)
-- **`au10002`**: 접근토큰 폐기 (`RevokeToken`)
-- **`ka00001`**: 계좌번호 조회 (`GetAccountNumber`)
-- **`ka10001`**: 주식 기본정보 요청 (`GetStockBasicInfo`)
-- **`ka00198`**: 실시간 종목 조회 순위 (`GetRealtimeStockRank`)
+Kiwoom REST API의 전체 구현 목록 및 현재 진행 상태는 [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md)에서 확인하실 수 있습니다.
 
 ## 사용 방법 (예제)
 
