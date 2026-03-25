@@ -61,5 +61,13 @@ func main() {
 }
 ```
 
+## 예제 (Examples)
+
+더 많은 예제는 [cmd/examples/](./cmd/examples/) 디렉토리에서 확인할 수 있습니다.
+- `01_auth`: 토큰 발급 및 폐기
+- `02_basic_info`: 주식 기본 정보 및 실시간 검색 순위 조회
+- `03_monitor`: 계좌 현황 모니터링
+- `04_trading`: 주식/신용 매수, 매도, 정정 및 취소 주문
+
 ## 확장 가이드
 `kioom` 패키지는 손쉽게 새로운 API 엔드포인트를 추가할 수 있도록 `Client` 구조체 내부에 공통 HTTP 요청 로직(`c.newRequest`, `c.do`)을 구현해 두었습니다. 공식 문서를 참고하여 추가하고자 하는 API의 Request, Response 구조체를 만들고, 메서드를 작성해주시면 됩니다.

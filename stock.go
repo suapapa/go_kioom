@@ -9,36 +9,36 @@ type StockBasicInfoRequest struct {
 
 // StockBasicInfoResponse contains detailed information about a single stock.
 type StockBasicInfoResponse struct {
-	StkCd            string `json:"stk_cd"`      // Stock code
-	StkNm            string `json:"stk_nm"`      // Stock name
-	SetlMm           string `json:"setl_mm"`     // Settlement month
-	Fav              string `json:"fav"`         // Par value
-	Cap              string `json:"cap"`         // Capital
-	FloStk           string `json:"flo_stk"`     // Number of floating shares
-	CrdRt            string `json:"crd_rt"`      // Credit ratio
-	OyrHgst          string `json:"oyr_hgst"`    // Year-to-date high
-	OyrLwst          string `json:"oyr_lwst"`    // Year-to-date low
-	Mac              string `json:"mac"`         // Market cap
-	MacWght          string `json:"mac_wght"`    // Market cap weight
-	ForExhRt         string `json:"for_exh_rt"`  // Foreigner exhaustion rate
-	ReplPric         string `json:"repl_pric"`   // Collateral value
-	Per              string `json:"per"`         // Price-to-earnings ratio
-	Eps              string `json:"eps"`         // Earnings per share
-	Roe              string `json:"roe"`         // Return on equity
-	Pbr              string `json:"pbr"`         // Price-to-book ratio
-	Ev               string `json:"ev"`          // Enterprise value
-	Bps              string `json:"bps"`         // Book value per share
-	SaleAmt          string `json:"sale_amt"`    // Revenue/Sales amount
-	BusPro           string `json:"bus_pro"`     // Operating profit
-	CupNga           string `json:"cup_nga"`     // Net income
-	High250          string `json:"250hgst"`     // 250-day high
-	Low250           string `json:"250lwst"`     // 250-day low
-	OpenPric         string `json:"open_pric"`   // Opening price
-	HighPric         string `json:"high_pric"`   // High price
-	LowPric          string `json:"low_pric"`    // Low price
-	UplPric          string `json:"upl_pric"`    // Upper limit price
-	LstPric          string `json:"lst_pric"`    // Lower limit price
-	BasePric         string `json:"base_pric"`   // Base price
+	StkCd            string `json:"stk_cd"`        // Stock code
+	StkNm            string `json:"stk_nm"`        // Stock name
+	SetlMm           string `json:"setl_mm"`       // Settlement month
+	Fav              string `json:"fav"`           // Par value
+	Cap              string `json:"cap"`           // Capital
+	FloStk           string `json:"flo_stk"`       // Number of floating shares
+	CrdRt            string `json:"crd_rt"`        // Credit ratio
+	OyrHgst          string `json:"oyr_hgst"`      // Year-to-date high
+	OyrLwst          string `json:"oyr_lwst"`      // Year-to-date low
+	Mac              string `json:"mac"`           // Market cap
+	MacWght          string `json:"mac_wght"`      // Market cap weight
+	ForExhRt         string `json:"for_exh_rt"`    // Foreigner exhaustion rate
+	ReplPric         string `json:"repl_pric"`     // Collateral value
+	Per              string `json:"per"`           // Price-to-earnings ratio
+	Eps              string `json:"eps"`           // Earnings per share
+	Roe              string `json:"roe"`           // Return on equity
+	Pbr              string `json:"pbr"`           // Price-to-book ratio
+	Ev               string `json:"ev"`            // Enterprise value
+	Bps              string `json:"bps"`           // Book value per share
+	SaleAmt          string `json:"sale_amt"`      // Revenue/Sales amount
+	BusPro           string `json:"bus_pro"`       // Operating profit
+	CupNga           string `json:"cup_nga"`       // Net income
+	High250          string `json:"250hgst"`       // 250-day high
+	Low250           string `json:"250lwst"`       // 250-day low
+	OpenPric         string `json:"open_pric"`     // Opening price
+	HighPric         string `json:"high_pric"`     // High price
+	LowPric          string `json:"low_pric"`      // Low price
+	UplPric          string `json:"upl_pric"`      // Upper limit price
+	LstPric          string `json:"lst_pric"`      // Lower limit price
+	BasePric         string `json:"base_pric"`     // Base price
 	ExpCntrPric      string `json:"exp_cntr_pric"` // Expected contract price
 	ExpCntrQty       string `json:"exp_cntr_qty"`  // Expected contract volume
 	High250PricDt    string `json:"250hgst_pric_dt"`

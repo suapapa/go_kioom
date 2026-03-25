@@ -2,7 +2,6 @@
 // It handles authentication, stock information retrieval, and account management.
 package kioom
 
-
 import (
 	"bytes"
 	"encoding/json"

@@ -1,5 +1,3 @@
 .gitignore
 .agents/
-_ref/
 skills-lock.json
-*.txt

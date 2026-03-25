@@ -18,7 +18,7 @@ This document tracks the implementation progress of the Kiwoom REST API wrapper 
 - [ ] `ka10085` - 계좌수익률요청
 - [ ] `ka10088` - 미체결 분할주문 상세
 - [ ] `ka10170` - 당일매매일지요청
-- [ ] `kt00001` - 예수금상세현황요청
+- [x] `kt00001` - [예수금상세현황요청](./account.go#L36)
 - [ ] `kt00002` - 일별추정예탁자산현황요청
 - [ ] `kt00003` - 추정자산조회요청
 - [ ] `kt00004` - 계좌평가현황요청
@@ -33,7 +33,7 @@ This document tracks the implementation progress of the Kiwoom REST API wrapper 
 - [ ] `kt00015` - 위탁종합거래내역요청
 - [ ] `kt00016` - 일별계좌수익률상세현황요청
 - [ ] `kt00017` - 계좌별당일현황요청
-- [ ] `kt00018` - 계좌평가잔고내역요청
+- [x] `kt00018` - [계좌평가잔고내역요청](./account.go#L81)
 - [ ] `kt50020` - 금현물 잔고확인
 - [ ] `kt50021` - 금현물 예수금
 - [ ] `kt50030` - 금현물 주문체결전체조회
@@ -163,14 +163,14 @@ This document tracks the implementation progress of the Kiwoom REST API wrapper 
 - [ ] `ka10174` - 조건검색 실시간 해제
 
 ## 📥 Trading (주문/신용주문)
-- [ ] `kt10000` - 주식 매수주문
-- [ ] `kt10001` - 주식 매도주문
-- [ ] `kt10002` - 주식 정정주문
-- [ ] `kt10003` - 주식 취소주문
-- [ ] `kt10006` - 신용 매수주문
-- [ ] `kt10007` - 신용 매도주문
-- [ ] `kt10008` - 신용 정정주문
-- [ ] `kt10009` - 신용 취소주문
+- [x] `kt10000` - [주식 매수주문](./order.go#L62)
+- [x] `kt10001` - [주식 매도주문](./order.go#L76)
+- [x] `kt10002` - [주식 정정주문](./order.go#L90)
+- [x] `kt10003` - [주식 취소주문](./order.go#L104)
+- [x] `kt10006` - [신용 매수주문](./order.go#L118)
+- [x] `kt10007` - [신용 매도주문](./order.go#L132)
+- [x] `kt10008` - [신용 정정주문](./order.go#L146)
+- [x] `kt10009` - [신용 취소주문](./order.go#L156)
 - [ ] `kt50000` - 금현물 매수주문
 - [ ] `kt50001` - 금현물 매도주문
 - [ ] `kt50002` - 금현물 정정주문
