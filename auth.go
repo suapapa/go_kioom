@@ -5,33 +5,38 @@ import (
 	"net/http"
 )
 
+// TokenRequest contains the credentials required to request a new access token.
 type TokenRequest struct {
 	GrantType string `json:"grant_type"`
 	AppKey    string `json:"appkey"`
 	SecretKey string `json:"secretkey"`
 }
 
+// TokenResponse contains the issued access token and its metadata.
 type TokenResponse struct {
-	ExpiresDt  string `json:"expires_dt"`
-	TokenType  string `json:"token_type"`
-	Token      string `json:"token"`
-	ReturnCode int    `json:"return_code"`
-	ReturnMsg  string `json:"return_msg"`
+	ExpiresDt  string `json:"expires_dt"`  // Format: YYYY-MM-DD HH:MM:SS
+	TokenType  string `json:"token_type"`  // Should be "Bearer"
+	Token      string `json:"token"`       // The access token itself
+	ReturnCode int    `json:"return_code"` // 0 for success
+	ReturnMsg  string `json:"return_msg"`  // Error message if return_code is not 0
 }
 
+// RevokeRequest contains the credentials required to revoke an access token.
 type RevokeRequest struct {
 	AppKey    string `json:"appkey"`
 	SecretKey string `json:"secretkey"`
 	Token     string `json:"token"`
 }
 
+// RevokeResponse indicates whether the revocation was successful.
 type RevokeResponse struct {
-	ReturnCode int    `json:"return_code"`
-	ReturnMsg  string `json:"return_msg"`
+	ReturnCode int    `json:"return_code"` // 0 for success
+	ReturnMsg  string `json:"return_msg"`  // Error message if return_code is not 0
 }
 
-// IssueToken issues a new access token and saves it in the client memory.
-// API ID: au10001
+// IssueToken issues a new access token using the client's credentials.
+// It automatically saves the issued token to the Client instance.
+// See Kiwoom API ID: au10001
 func (c *Client) IssueToken() (*TokenResponse, error) {
 	reqBody := TokenRequest{
 		GrantType: "client_credentials",
@@ -59,7 +64,8 @@ func (c *Client) IssueToken() (*TokenResponse, error) {
 }
 
 // RevokeToken revokes the currently issued access token.
-// API ID: au10002
+// After successfully revoking the token, the Client's internal Token field is cleared.
+// See Kiwoom API ID: au10002
 func (c *Client) RevokeToken() (*RevokeResponse, error) {
 	reqBody := RevokeRequest{
 		AppKey:    c.AppKey,

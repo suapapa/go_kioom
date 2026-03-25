@@ -1,4 +1,7 @@
+// Package kioom provides a Go wrapper for the Kiwoom Open API (REST).
+// It handles authentication, stock information retrieval, and account management.
 package kioom
+
 
 import (
 	"bytes"
@@ -9,21 +12,24 @@ import (
 )
 
 const (
+	// LiveDomain is the base URL for the live Kiwoom investment environment.
 	LiveDomain = "https://api.kiwoom.com"
+	// MockDomain is the base URL for the mock/simulated Kiwoom investment environment.
 	MockDomain = "https://mockapi.kiwoom.com"
 )
 
-// Client is the main Kiwoom REST API client
+// Client is the entry point for interacting with the Kiwoom REST API.
+// It keeps track of the base URL, authentication keys, and the issued token.
 type Client struct {
-	BaseURL    string
-	AppKey     string
-	SecretKey  string
-	Token      string
-	HTTPClient *http.Client
+	BaseURL    string       // API base URL (Live or Mock)
+	AppKey     string       // Kiwoom App Key
+	SecretKey  string       // Kiwoom Secret Key
+	Token      string       // Issued access token (if available)
+	HTTPClient *http.Client // Customizable HTTP client
 }
 
-// NewClient returns a new Kiwoom REST API client.
-// If useMock is true, it uses the mock api domain.
+// NewClient returns a new Kiwoom REST API client with the given credentials.
+// If useMock is true, it uses the mock investment environment domain instead of the live API.
 func NewClient(appKey, secretKey string, useMock bool) *Client {
 	baseURL := LiveDomain
 	if useMock {
@@ -37,7 +43,8 @@ func NewClient(appKey, secretKey string, useMock bool) *Client {
 	}
 }
 
-// SetToken sets the OAuth token manually and allows you to reuse an existing token
+// SetToken sets the OAuth token manually. This is useful for reusing an existing,
+// valid token across different client instances or application restarts.
 func (c *Client) SetToken(token string) {
 	c.Token = token
 }

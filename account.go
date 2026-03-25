@@ -2,14 +2,16 @@ package kioom
 
 import "net/http"
 
+// AccountResponse contains information about the user's trading account.
 type AccountResponse struct {
-	AcctNo     string `json:"acctNo"`
-	ReturnCode int    `json:"return_code"`
-	ReturnMsg  string `json:"return_msg"`
+	AcctNo     string `json:"acctNo"`      // Account number
+	ReturnCode int    `json:"return_code"` // 0 for success
+	ReturnMsg  string `json:"return_msg"`  // Error message if return_code is not 0
 }
 
-// GetAccountNumber queries the account number belonging to the current authorized token.
-// API ID: ka00001
+// GetAccountNumber retrieves the account number associated with the current session.
+// This requires a valid access token to be set on the client.
+// See Kiwoom API ID: ka00001
 func (c *Client) GetAccountNumber() (*AccountResponse, error) {
 	// body could be empty JSON object
 	req, err := c.newRequest(http.MethodPost, "/api/dostk/acnt", "ka00001", map[string]interface{}{})

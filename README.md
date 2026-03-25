@@ -1,5 +1,7 @@
 # go_kioom : A Go package for Kiwoom REST API
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/suapapa/go_kioom.svg)](https://pkg.go.dev/github.com/suapapa/go_kioom)
+
 `go_kioom` 은 키움증권 REST API 명세서에 맞춰 작성된 비공식 Golang 래퍼(Wrapper) 패키지입니다. 
 
 ## 현재 구현된 기능
