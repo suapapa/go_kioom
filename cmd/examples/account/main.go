@@ -6,20 +6,20 @@ import (
 	"os"
 
 	"github.com/suapapa/go_kioom"
+	"github.com/suapapa/go_kioom/internal/kioomenv"
 )
 
 func main() {
 	// For example purposes, we use environment variables for AppKey and SecretKey.
 	// In a real application, you should handle these securely.
-	appKey := os.Getenv("KIWOOM_APP_KEY")
-	secretKey := os.Getenv("KIWOOM_SECRET_KEY")
+	cfg := kioomenv.Load(os.Getenv)
 
-	if appKey == "" || secretKey == "" {
-		log.Println("KIWOOM_APP_KEY or KIWOOM_SECRET_KEY not set. Using mock mode.")
+	if err := cfg.RequireAppKeys(); err != nil {
+		log.Println("KIOOM_APP_KEY or KIOOM_SECRET_KEY not set. Using mock mode.")
 	}
 
 	// Initialize client (mock mode if keys are missing)
-	client := kioom.NewClient(appKey, secretKey, true)
+	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, true)
 
 	// Note: In a real scenario, you need to set the Token after authentication.
 	// For this example, we assume the token is already set or the server is mocked.

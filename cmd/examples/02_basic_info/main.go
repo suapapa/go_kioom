@@ -6,17 +6,16 @@ import (
 	"os"
 
 	"github.com/suapapa/go_kioom"
+	"github.com/suapapa/go_kioom/internal/kioomenv"
 )
 
 func main() {
-	appKey := os.Getenv("KIOOM_APP_KEY")
-	secretKey := os.Getenv("KIOOM_SECRET_KEY")
-
-	if appKey == "" || secretKey == "" {
-		log.Fatal("KIOOM_APP_KEY and KIOOM_SECRET_KEY environment variables are required.")
+	cfg := kioomenv.Load(os.Getenv)
+	if err := cfg.RequireAppKeys(); err != nil {
+		log.Fatal(err)
 	}
 
-	client := kioom.NewClient(appKey, secretKey, true) // 모의투자 사용
+	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, true) // 모의투자 사용
 
 	// 토큰 발급
 	_, err := client.IssueToken()

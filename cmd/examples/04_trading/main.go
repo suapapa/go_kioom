@@ -7,18 +7,17 @@ import (
 	"os"
 
 	"github.com/suapapa/go_kioom"
+	"github.com/suapapa/go_kioom/internal/kioomenv"
 )
 
 func main() {
-	// 1. Initialize the client using credentials from environment variables.
-	appKey := os.Getenv("KIWOOM_APP_KEY")
-	secretKey := os.Getenv("KIWOOM_SECRET_KEY")
-	if appKey == "" || secretKey == "" {
-		log.Fatal("KIWOOM_APP_KEY and KIWOOM_SECRET_KEY must be set in the environment")
+	cfg := kioomenv.Load(os.Getenv)
+	if err := cfg.RequireAppKeys(); err != nil {
+		log.Fatal(err)
 	}
 
 	// Use mock domain for testing if needed
-	client := kioom.NewClient(appKey, secretKey, true)
+	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, true)
 
 	// 2. Obtain an access token
 	tokenRes, err := client.IssueToken()

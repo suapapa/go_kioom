@@ -13,13 +13,13 @@ This document explains how an AI agent should use the `kioom` CLI safely and rel
 ## Install
 
 ```bash
-go install github.com/suapapa/go_kioom/cmd/kioom
+go install github.com/suapapa/go_kioom/cmd/kioom-cli
 ```
 
 ## Build
 
 ```bash
-go build -o bin/kioom ./cmd/kioom
+go build -o bin/kioom-cli ./cmd/kioom-cli
 ```
 
 ## Global Options

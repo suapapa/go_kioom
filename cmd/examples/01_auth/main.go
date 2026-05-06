@@ -6,20 +6,19 @@ import (
 	"os"
 
 	"github.com/suapapa/go_kioom"
+	"github.com/suapapa/go_kioom/internal/kioomenv"
 )
 
 func main() {
-	appKey := os.Getenv("KIOOM_APP_KEY")
-	secretKey := os.Getenv("KIOOM_SECRET_KEY")
-
-	if appKey == "" || secretKey == "" {
-		log.Fatal("KIOOM_APP_KEY and KIOOM_SECRET_KEY environment variables are required.")
+	cfg := kioomenv.Load(os.Getenv)
+	if err := cfg.RequireAppKeys(); err != nil {
+		log.Fatal(err)
 	}
 
 	useMock := true // 모의투자 환경 사용 여부
 
 	// 1. 클라이언트 생성
-	client := kioom.NewClient(appKey, secretKey, useMock)
+	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, useMock)
 
 	// 2. 접근토큰 발급 (자동으로 client.Token에 저장됨)
 	log.Println("접근토큰 발급을 요청합니다...")

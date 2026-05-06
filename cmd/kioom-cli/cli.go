@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	kioom "github.com/suapapa/go_kioom"
+	"github.com/suapapa/go_kioom/internal/kioomenv"
+	"github.com/suapapa/go_kioom/internal/kioomvalidate"
 )
 
 type envGetter func(string) string
@@ -18,6 +20,33 @@ type globalConfig struct {
 	token     string
 	mock      bool
 	output    string
+}
+
+// commandFunc runs one CLI action. output is json|pretty; args are positional flags after section/action.
+type commandFunc func(client *kioom.Client, output string, args []string, stdout io.Writer) error
+
+// catalog maps "section" -> "action" -> handler. It stays aligned with [commandSchemaMap] in schema.go.
+var catalog = map[string]map[string]commandFunc{
+	"auth": {
+		"issue":  cmdAuthIssue,
+		"revoke": cmdAuthRevoke,
+	},
+	"account": {
+		"number":  cmdAccountNumber,
+		"deposit": cmdAccountDeposit,
+		"balance": cmdAccountBalance,
+	},
+	"stock": {
+		"basic":        cmdStockBasic,
+		"rank":         cmdStockRank,
+		"minute-chart": cmdStockMinuteChart,
+	},
+	"order": {
+		"buy":    cmdOrderBuy,
+		"sell":   cmdOrderSell,
+		"modify": cmdOrderModify,
+		"cancel": cmdOrderCancel,
+	},
 }
 
 func run(args []string, stdout io.Writer, stderr io.Writer, getenv envGetter) int {
@@ -53,10 +82,12 @@ func run(args []string, stdout io.Writer, stderr io.Writer, getenv envGetter) in
 }
 
 func parseGlobal(args []string, getenv envGetter) (globalConfig, []string, error) {
+	env := kioomenv.Load(getenv)
 	cfg := globalConfig{
-		appKey:    getenv("KIOOM_APP_KEY"),
-		secretKey: getenv("KIOOM_SECRET_KEY"),
-		token:     getenv("KIOOM_TOKEN"),
+		appKey:    env.AppKey,
+		secretKey: env.SecretKey,
+		token:     env.Token,
+		mock:      env.Mock,
 		output:    "json",
 	}
 
@@ -84,23 +115,17 @@ func runCommand(client *kioom.Client, cfg globalConfig, args []string, stdout io
 	if len(args) < 2 {
 		return errors.New(usageText())
 	}
+	section, action, cmdArgs := args[0], args[1], args[2:]
 
-	section := args[0]
-	action := args[1]
-	cmdArgs := args[2:]
-
-	switch section {
-	case "auth":
-		return runAuth(client, cfg.output, action, cmdArgs, stdout)
-	case "account":
-		return runAccount(client, cfg.output, action, cmdArgs, stdout)
-	case "stock":
-		return runStock(client, cfg.output, action, cmdArgs, stdout)
-	case "order":
-		return runOrder(client, cfg.output, action, cmdArgs, stdout)
-	default:
+	actions, ok := catalog[section]
+	if !ok {
 		return fmt.Errorf("unknown section %q", section)
 	}
+	h, ok := actions[action]
+	if !ok {
+		return fmt.Errorf("unknown %s action %q", section, action)
+	}
+	return h(client, cfg.output, cmdArgs, stdout)
 }
 
 func usageText() string {
@@ -121,171 +146,164 @@ examples:
 }
 
 func requireCredentials(cfg globalConfig) error {
-	if strings.TrimSpace(cfg.appKey) == "" || strings.TrimSpace(cfg.secretKey) == "" {
-		return errors.New("app-key and secret-key are required (or set KIOOM_APP_KEY/KIOOM_SECRET_KEY)")
-	}
-	return nil
+	return kioomenv.Config{AppKey: cfg.appKey, SecretKey: cfg.secretKey}.RequireAppKeys()
 }
 
-func runAuth(client *kioom.Client, output, action string, _ []string, stdout io.Writer) error {
-	switch action {
-	case "issue":
-		res, err := client.IssueToken()
-		if err != nil {
-			return err
-		}
-		return writeOK(stdout, output, res)
-	case "revoke":
-		res, err := client.RevokeToken()
-		if err != nil {
-			return err
-		}
-		return writeOK(stdout, output, res)
-	default:
-		return fmt.Errorf("unknown auth action %q", action)
+func cmdAuthIssue(c *kioom.Client, output string, _ []string, w io.Writer) error {
+	res, err := c.IssueToken()
+	if err != nil {
+		return err
 	}
+	return writeOK(w, output, res)
 }
 
-func runAccount(client *kioom.Client, output, action string, args []string, stdout io.Writer) error {
-	switch action {
-	case "number":
-		res, err := client.GetAccountNumber()
-		if err != nil {
-			return err
-		}
-		return writeOK(stdout, output, res)
-	case "deposit":
-		var req kioom.DepositRequest
-		if err := parseJSONArg(args, &req); err != nil {
-			return err
-		}
-		if err := validateDepositRequest(&req); err != nil {
-			return err
-		}
-		res, err := client.GetDeposit(&req)
-		if err != nil {
-			return err
-		}
-		return writeOK(stdout, output, res)
-	case "balance":
-		var req kioom.AccountBalanceRequest
-		if err := parseJSONArg(args, &req); err != nil {
-			return err
-		}
-		if err := validateAccountBalanceRequest(&req); err != nil {
-			return err
-		}
-		res, err := client.GetAccountBalance(&req)
-		if err != nil {
-			return err
-		}
-		return writeOK(stdout, output, res)
-	default:
-		return fmt.Errorf("unknown account action %q", action)
+func cmdAuthRevoke(c *kioom.Client, output string, _ []string, w io.Writer) error {
+	res, err := c.RevokeToken()
+	if err != nil {
+		return err
 	}
+	return writeOK(w, output, res)
 }
 
-func runStock(client *kioom.Client, output, action string, args []string, stdout io.Writer) error {
-	switch action {
-	case "basic":
-		var req kioom.StockBasicInfoRequest
-		if err := parseJSONArg(args, &req); err != nil {
-			return err
-		}
-		if err := validateStockCode(req.StkCd); err != nil {
-			return err
-		}
-		res, err := client.GetStockBasicInfo(req.StkCd)
-		if err != nil {
-			return err
-		}
-		return writeOK(stdout, output, res)
-	case "rank":
-		var req kioom.RealtimeItemRankRequest
-		if err := parseJSONArg(args, &req); err != nil {
-			return err
-		}
-		if err := validateRankRequest(&req); err != nil {
-			return err
-		}
-		res, err := client.GetRealtimeStockRank(req.QryTp)
-		if err != nil {
-			return err
-		}
-		return writeOK(stdout, output, res)
-	case "minute-chart":
-		var req kioom.StockMinuteChartRequest
-		if err := parseJSONArg(args, &req); err != nil {
-			return err
-		}
-		if err := validateMinuteChartRequest(&req); err != nil {
-			return err
-		}
-		res, err := client.GetStockMinuteChart(&req)
-		if err != nil {
-			return err
-		}
-		return writeOK(stdout, output, res)
-	default:
-		return fmt.Errorf("unknown stock action %q", action)
+func cmdAccountNumber(c *kioom.Client, output string, _ []string, w io.Writer) error {
+	res, err := c.GetAccountNumber()
+	if err != nil {
+		return err
 	}
+	return writeOK(w, output, res)
 }
 
-func runOrder(client *kioom.Client, output, action string, args []string, stdout io.Writer) error {
-	switch action {
-	case "buy":
-		var req kioom.OrderRequest
-		if err := parseJSONArg(args, &req); err != nil {
-			return err
-		}
-		if err := validateOrderRequest(&req); err != nil {
-			return err
-		}
-		res, err := client.OrderBuy(&req)
-		if err != nil {
-			return err
-		}
-		return writeOK(stdout, output, res)
-	case "sell":
-		var req kioom.OrderRequest
-		if err := parseJSONArg(args, &req); err != nil {
-			return err
-		}
-		if err := validateOrderRequest(&req); err != nil {
-			return err
-		}
-		res, err := client.OrderSell(&req)
-		if err != nil {
-			return err
-		}
-		return writeOK(stdout, output, res)
-	case "modify":
-		var req kioom.OrderModifyRequest
-		if err := parseJSONArg(args, &req); err != nil {
-			return err
-		}
-		if err := validateOrderModifyRequest(&req); err != nil {
-			return err
-		}
-		res, err := client.OrderModify(&req)
-		if err != nil {
-			return err
-		}
-		return writeOK(stdout, output, res)
-	case "cancel":
-		var req kioom.OrderCancelRequest
-		if err := parseJSONArg(args, &req); err != nil {
-			return err
-		}
-		if err := validateOrderCancelRequest(&req); err != nil {
-			return err
-		}
-		res, err := client.OrderCancel(&req)
-		if err != nil {
-			return err
-		}
-		return writeOK(stdout, output, res)
-	default:
-		return fmt.Errorf("unknown order action %q", action)
+func cmdAccountDeposit(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.DepositRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
 	}
+	if err := kioomvalidate.ValidateDepositRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.GetDeposit(&req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdAccountBalance(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.AccountBalanceRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateAccountBalanceRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.GetAccountBalance(&req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdStockBasic(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.StockBasicInfoRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateStockCode(req.StkCd); err != nil {
+		return err
+	}
+	res, err := c.GetStockBasicInfo(req.StkCd)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdStockRank(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.RealtimeItemRankRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateRankRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.GetRealtimeStockRank(req.QryTp)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdStockMinuteChart(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.StockMinuteChartRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateMinuteChartRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.GetStockMinuteChart(&req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdOrderBuy(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.OrderRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateOrderRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.OrderBuy(&req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdOrderSell(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.OrderRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateOrderRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.OrderSell(&req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdOrderModify(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.OrderModifyRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateOrderModifyRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.OrderModify(&req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdOrderCancel(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.OrderCancelRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateOrderCancelRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.OrderCancel(&req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
 }

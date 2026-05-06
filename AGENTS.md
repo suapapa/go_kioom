@@ -43,11 +43,18 @@ When adding a new Kiwoom REST API endpoint (e.g., `ka20001` - Order), follow thi
     }
     ```
 3.  **Authentication Handshake**: Ensure methods that require a token check `c.Token` or trigger an appropriate error.
+4.  **Extend programs under `cmd/`**: Whenever you add or materially change functionality in the root library (`/`), ship the same capability in the relevant `cmd/*` binaries so CLI users and agents stay aligned with the SDK. Typical follow-ups:
+    * **Agent-facing CLI** (`cmd/kioom-cli/`): wire `<section> <action>`, add `--json` parsing and local validation consistent with existing commands, register the pair in `commandSchemaMap` (see `schema.go`), add or extend table-driven tests (see `main_test.go`), update `README.md` under that command.
+    * **Examples**: add or update runnable examples under `cmd/examples/` when the feature is intended for tutorials or copy-paste starting points.
+    * **Other `cmd/` tools**: if another entry under `cmd/` (for example MCP) exposes API surface, mirror the new endpoint or behavior there in the same change or a coordinated follow-up so nothing drifts.
 
 ### 2. Testing Vibe
 We use `http.HandlerFunc` to mock the Kiwoom API in tests. Maintain this pattern to avoid external dependencies during tests.
 *   See `client_test.go` or `auth_test.go` for reference.
 *   Always use table-driven tests for multiple scenarios (success, auth error, validation error, etc.).
+
+### 3. Keep `cmd/` in sync (general rule)
+Any new user-facing capability in the library should land with corresponding updates under `cmd/` wherever that capability is meant to be used (CLI, examples, MCP, and so on). Do not ship library-only changes and leave shipped `cmd/` programs behind the core package.
 
 ---
 
@@ -79,6 +86,11 @@ When acting as an agent on this project, ensure:
 ## 🗂 Project Structure Breakdown
 
 -   `/`: Core library files (`client.go`, `auth.go`, `account.go`, etc.).
+-   `cmd/kioom-cli/`: Agent-oriented CLI; keep parity with library endpoints via `cli.go`, `schema.go`, `validate.go`, and tests. Shares request validation with MCP via `internal/kioomvalidate/`.
+-   `cmd/kioom-mcp/`: MCP server entry (`kioom-mcp`); runs the shared server in `internal/mcpkioom/` with `-transport stdio` (default) or `-transport sse`. Add new API tools only in `internal/mcpkioom/` so both transports stay aligned.
+-   `internal/mcpkioom/`: Registers Kiwoom tools on a single `mcp.Server` instance consumed by stdio and SSE transports.
+-   `internal/kioomvalidate/`: Shared field validations for CLI and MCP tool handlers.
+-   `internal/kioomenv/`: Shared `KIOOM_*` environment loading for `kioom-cli`, `kioom-mcp`, and `cmd/examples/*`.
 -   `cmd/examples/`: Practical, runnable examples for users.
 -   `_ref/`: (Optional) Reference documents or original API specs.
 -   `.agents/`: Custom AI instructions and skills (e.g., `golang-pro`).

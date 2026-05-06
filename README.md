@@ -69,9 +69,13 @@ func main() {
 - `03_monitor`: 계좌 현황 모니터링
 - `04_trading`: 주식/신용 매수, 매도, 정정 및 취소 주문
 
-## CLI (`kioom`)
+## CLI (`kioom-cli`)
 
-자세한 내용은 [cmd/kioom/README.md](cmd/kioom/README.md)를 참고하세요.
+JSON 기반 명령 실행·스키마 조회용 CLI입니다. 설치, 옵션, 오류 코드·출력 규약은 [cmd/kioom-cli/README.md](cmd/kioom-cli/README.md)를 참고하세요.
+
+## MCP (`kioom-mcp`)
+
+동일한 `Client`를 **Model Context Protocol** 서버로 노출합니다. Cursor·Claude Desktop 등 MCP 클라이언트는 **stdio**(기본)나 **HTTP + SSE** 전송으로 연결할 수 있고, 인증·검증 규칙은 `kioom-cli`와 맞춰져 있습니다. 설치·환경 변수·노출 도구 목록은 [cmd/kioom-mcp/README.md](cmd/kioom-mcp/README.md)를 참고하세요.
 
 ## 확장 가이드
 `kioom` 패키지는 손쉽게 새로운 API 엔드포인트를 추가할 수 있도록 `Client` 구조체 내부에 공통 HTTP 요청 로직(`c.newRequest`, `c.do`)을 구현해 두었습니다. 공식 문서를 참고하여 추가하고자 하는 API의 Request, Response 구조체를 만들고, 메서드를 작성해주시면 됩니다.

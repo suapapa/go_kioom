@@ -7,8 +7,8 @@ import (
 )
 
 type okEnvelope struct {
-	OK   bool        `json:"ok"`
-	Data interface{} `json:"data"`
+	OK   bool `json:"ok"`
+	Data any  `json:"data"`
 }
 
 type errEnvelope struct {
@@ -19,7 +19,7 @@ type errEnvelope struct {
 	} `json:"error"`
 }
 
-func writeOK(w io.Writer, output string, data interface{}) error {
+func writeOK(w io.Writer, output string, data any) error {
 	return writeEnvelope(w, output, okEnvelope{
 		OK:   true,
 		Data: data,
@@ -33,7 +33,7 @@ func writeErr(w io.Writer, output, code string, err error) {
 	_ = writeEnvelope(w, output, e)
 }
 
-func writeEnvelope(w io.Writer, output string, payload interface{}) error {
+func writeEnvelope(w io.Writer, output string, payload any) error {
 	var (
 		b   []byte
 		err error
