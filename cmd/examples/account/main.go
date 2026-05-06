@@ -1,11 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/suapapa/go_kioom"
+	kioom "github.com/suapapa/go_kioom"
 	"github.com/suapapa/go_kioom/internal/kioomenv"
 )
 
@@ -18,15 +19,17 @@ func main() {
 		log.Println("KIOOM_APP_KEY or KIOOM_SECRET_KEY not set. Using mock mode.")
 	}
 
+	ctx := context.Background()
+
 	// Initialize client (mock mode if keys are missing)
-	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, true)
+	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, kioom.WithMockDomain())
 
 	// Note: In a real scenario, you need to set the Token after authentication.
 	// For this example, we assume the token is already set or the server is mocked.
 
 	// 1. Get Account Number
 	fmt.Println("--- Account Number ---")
-	accRes, err := client.GetAccountNumber()
+	accRes, err := client.GetAccountNumber(ctx)
 	if err != nil {
 		log.Fatalf("failed to get account number: %v", err)
 	}
@@ -34,7 +37,7 @@ func main() {
 
 	// 2. Get Deposit (예수금)
 	fmt.Println("\n--- Deposit (예수금) ---")
-	depRes, err := client.GetDeposit(&kioom.DepositRequest{
+	depRes, err := client.GetDeposit(ctx, &kioom.DepositRequest{
 		QryTp: "2", // General
 	})
 	if err != nil {
@@ -46,7 +49,7 @@ func main() {
 
 	// 3. Get Account Balance (계좌잔고)
 	fmt.Println("\n--- Account Balance (계좌잔고/수익률) ---")
-	balRes, err := client.GetAccountBalance(&kioom.AccountBalanceRequest{
+	balRes, err := client.GetAccountBalance(ctx, &kioom.AccountBalanceRequest{
 		QryTp:     "1",   // Sum
 		DmstStkTP: "KRX", // Korea Exchange
 	})

@@ -1,6 +1,7 @@
 package kioom
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 )
@@ -37,14 +38,14 @@ type RevokeResponse struct {
 // IssueToken issues a new access token using the client's credentials.
 // It automatically saves the issued token to the Client instance.
 // See Kiwoom API ID: au10001
-func (c *Client) IssueToken() (*TokenResponse, error) {
+func (c *Client) IssueToken(ctx context.Context) (*TokenResponse, error) {
 	reqBody := TokenRequest{
 		GrantType: "client_credentials",
-		AppKey:    c.AppKey,
-		SecretKey: c.SecretKey,
+		AppKey:    c.appKey,
+		SecretKey: c.secretKey,
 	}
 
-	req, err := c.newRequest(http.MethodPost, "/oauth2/token", "au10001", reqBody)
+	req, err := c.newRequest(ctx, http.MethodPost, "/oauth2/token", API_IssueToken, reqBody)
 	if err != nil {
 		return nil, err
 	}
@@ -59,21 +60,21 @@ func (c *Client) IssueToken() (*TokenResponse, error) {
 	}
 
 	// Save token so consequent calls uses this Bearer token automatically
-	c.Token = res.Token
+	c.SetToken(res.Token)
 	return &res, nil
 }
 
 // RevokeToken revokes the currently issued access token.
 // After successfully revoking the token, the Client's internal Token field is cleared.
 // See Kiwoom API ID: au10002
-func (c *Client) RevokeToken() (*RevokeResponse, error) {
+func (c *Client) RevokeToken(ctx context.Context) (*RevokeResponse, error) {
 	reqBody := RevokeRequest{
-		AppKey:    c.AppKey,
-		SecretKey: c.SecretKey,
-		Token:     c.Token,
+		AppKey:    c.appKey,
+		SecretKey: c.secretKey,
+		Token:     c.Token(),
 	}
 
-	req, err := c.newRequest(http.MethodPost, "/oauth2/revoke", "au10002", reqBody)
+	req, err := c.newRequest(ctx, http.MethodPost, "/oauth2/revoke", API_RevokeToken, reqBody)
 	if err != nil {
 		return nil, err
 	}
@@ -88,6 +89,6 @@ func (c *Client) RevokeToken() (*RevokeResponse, error) {
 	}
 
 	// Purge token logically after revocation
-	c.Token = ""
+	c.SetToken("")
 	return &res, nil
 }

@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/suapapa/go_kioom"
+	kioom "github.com/suapapa/go_kioom"
 	"github.com/suapapa/go_kioom/internal/kioomenv"
 )
 
@@ -19,16 +19,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, true) // 모의투자
-
-	// 토큰 발급
-	_, err := client.IssueToken()
-	if err != nil {
-		log.Fatalf("토큰 발급 실패: %v", err)
-	}
+	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, kioom.WithMockDomain()) // 모의투자
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
+
+	// 토큰 발급
+	_, err := client.IssueToken(ctx)
+	if err != nil {
+		log.Fatalf("토큰 발급 실패: %v", err)
+	}
 
 	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
@@ -43,7 +43,7 @@ func main() {
 			return
 		case <-ticker.C:
 			// "5": 30초 실시간 조회 순위
-			rankRes, err := client.GetRealtimeStockRank("5")
+			rankRes, err := client.GetRealtimeStockRank(ctx, "5")
 			if err != nil {
 				log.Printf("⚠️ 조회 실패: %v", err)
 				continue

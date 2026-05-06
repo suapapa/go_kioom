@@ -1,6 +1,7 @@
 package kioom
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -10,8 +11,8 @@ import (
 func TestOrderBuy(t *testing.T) {
 	expectedOrdNo := "0001234"
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("api-id") != "kt10000" {
-			t.Errorf("expected api-id kt10000, got %s", r.Header.Get("api-id"))
+		if r.Header.Get("api-id") != API_OrderBuy {
+			t.Errorf("expected api-id %s, got %s", API_OrderBuy, r.Header.Get("api-id"))
 		}
 		res := OrderResponse{
 			OrdNo:      expectedOrdNo,
@@ -23,8 +24,8 @@ func TestOrderBuy(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := NewClient("app", "sec", true)
-	client.BaseURL = server.URL
+	client := NewClient("app", "sec", WithMockDomain())
+	client.baseURL = server.URL
 	client.SetToken("valid-token")
 
 	req := &OrderRequest{
@@ -35,7 +36,7 @@ func TestOrderBuy(t *testing.T) {
 		TrdeTp:     "0",
 	}
 
-	res, err := client.OrderBuy(req)
+	res, err := client.OrderBuy(context.Background(), req)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -48,8 +49,8 @@ func TestOrderBuy(t *testing.T) {
 func TestOrderCancel(t *testing.T) {
 	expectedOrdNo := "0001235"
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("api-id") != "kt10003" {
-			t.Errorf("expected api-id kt10003, got %s", r.Header.Get("api-id"))
+		if r.Header.Get("api-id") != API_OrderCancel {
+			t.Errorf("expected api-id %s, got %s", API_OrderCancel, r.Header.Get("api-id"))
 		}
 		res := OrderCancelResponse{
 			OrdNo:         expectedOrdNo,
@@ -61,8 +62,8 @@ func TestOrderCancel(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := NewClient("app", "sec", true)
-	client.BaseURL = server.URL
+	client := NewClient("app", "sec", WithMockDomain())
+	client.baseURL = server.URL
 	client.SetToken("valid-token")
 
 	req := &OrderCancelRequest{
@@ -72,7 +73,7 @@ func TestOrderCancel(t *testing.T) {
 		CnclQty:    "5",
 	}
 
-	res, err := client.OrderCancel(req)
+	res, err := client.OrderCancel(context.Background(), req)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -88,8 +89,8 @@ func TestOrderCancel(t *testing.T) {
 func TestCreditOrderSell(t *testing.T) {
 	expectedOrdNo := "0001236"
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("api-id") != "kt10007" {
-			t.Errorf("expected api-id kt10007, got %s", r.Header.Get("api-id"))
+		if r.Header.Get("api-id") != API_CreditOrderSell {
+			t.Errorf("expected api-id %s, got %s", API_CreditOrderSell, r.Header.Get("api-id"))
 		}
 		res := OrderResponse{
 			OrdNo:      expectedOrdNo,
@@ -100,8 +101,8 @@ func TestCreditOrderSell(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := NewClient("app", "sec", true)
-	client.BaseURL = server.URL
+	client := NewClient("app", "sec", WithMockDomain())
+	client.baseURL = server.URL
 	client.SetToken("valid-token")
 
 	req := &CreditSellRequest{
@@ -114,7 +115,7 @@ func TestCreditOrderSell(t *testing.T) {
 		CrdLoanDt:  "20231027",
 	}
 
-	res, err := client.CreditOrderSell(req)
+	res, err := client.CreditOrderSell(context.Background(), req)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

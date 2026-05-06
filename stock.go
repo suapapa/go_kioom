@@ -1,6 +1,9 @@
 package kioom
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+)
 
 // StockBasicInfoRequest represents the payload for querying stock metadata.
 type StockBasicInfoRequest struct {
@@ -60,12 +63,12 @@ type StockBasicInfoResponse struct {
 
 // GetStockBasicInfo retrieves comprehensive metadata for a specific stock.
 // See Kiwoom API ID: ka10001
-func (c *Client) GetStockBasicInfo(stockCode string) (*StockBasicInfoResponse, error) {
+func (c *Client) GetStockBasicInfo(ctx context.Context, stockCode string) (*StockBasicInfoResponse, error) {
 	reqBody := StockBasicInfoRequest{
 		StkCd: stockCode,
 	}
 
-	req, err := c.newRequest(http.MethodPost, "/api/dostk/stkinfo", "ka10001", reqBody)
+	req, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/stkinfo", API_GetStockBasicInfo, reqBody)
 	if err != nil {
 		return nil, err
 	}
@@ -109,12 +112,12 @@ type RealtimeItemRankResponse struct {
 // GetRealtimeStockRank retrieves the most searched stocks in realtime.
 // Use qryTp to specify the time window: "1" (1m), "2" (10m), "3" (1h), "4" (daily), "5" (30s)
 // See Kiwoom API ID: ka00198
-func (c *Client) GetRealtimeStockRank(qryTp string) (*RealtimeItemRankResponse, error) {
+func (c *Client) GetRealtimeStockRank(ctx context.Context, qryTp string) (*RealtimeItemRankResponse, error) {
 	reqBody := RealtimeItemRankRequest{
 		QryTp: qryTp,
 	}
 
-	req, err := c.newRequest(http.MethodPost, "/api/dostk/stkinfo", "ka00198", reqBody)
+	req, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/stkinfo", API_GetRealtimeRank, reqBody)
 	if err != nil {
 		return nil, err
 	}
@@ -161,8 +164,8 @@ type StockMinuteChartResponse struct {
 // updStkpcTp: "0" (Standard) or "1" (Adjusted).
 // baseDt: Target date in YYYYMMDD format.
 // See Kiwoom API ID: ka10080
-func (c *Client) GetStockMinuteChart(req *StockMinuteChartRequest) (*StockMinuteChartResponse, error) {
-	httpReq, err := c.newRequest(http.MethodPost, "/api/dostk/chart", "ka10080", req)
+func (c *Client) GetStockMinuteChart(ctx context.Context, req *StockMinuteChartRequest) (*StockMinuteChartResponse, error) {
+	httpReq, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/chart", API_GetMinuteChart, req)
 	if err != nil {
 		return nil, err
 	}

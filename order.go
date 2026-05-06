@@ -1,6 +1,9 @@
 package kioom
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+)
 
 // OrderRequest represents the payload for common stock buy/sell orders.
 // Used for TR: kt10000 (Buy), kt10001 (Sell)
@@ -35,7 +38,6 @@ type OrderCancelRequest struct {
 
 // CreditOrderRequest represents the payload for credit buy orders.
 // Used for TR: kt10006
-// NOTE: According to spec, credit buy has same fields as normal buy.
 type CreditOrderRequest struct {
 	OrderRequest
 }
@@ -82,8 +84,8 @@ type OrderCancelResponse struct {
 
 // OrderBuy sends a stock buy order.
 // See Kiwoom API ID: kt10000
-func (c *Client) OrderBuy(req *OrderRequest) (*OrderResponse, error) {
-	httpReq, err := c.newRequest(http.MethodPost, "/api/dostk/ordr", "kt10000", req)
+func (c *Client) OrderBuy(ctx context.Context, req *OrderRequest) (*OrderResponse, error) {
+	httpReq, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/ordr", API_OrderBuy, req)
 	if err != nil {
 		return nil, err
 	}
@@ -96,8 +98,8 @@ func (c *Client) OrderBuy(req *OrderRequest) (*OrderResponse, error) {
 
 // OrderSell sends a stock sell order.
 // See Kiwoom API ID: kt10001
-func (c *Client) OrderSell(req *OrderRequest) (*OrderResponse, error) {
-	httpReq, err := c.newRequest(http.MethodPost, "/api/dostk/ordr", "kt10001", req)
+func (c *Client) OrderSell(ctx context.Context, req *OrderRequest) (*OrderResponse, error) {
+	httpReq, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/ordr", API_OrderSell, req)
 	if err != nil {
 		return nil, err
 	}
@@ -110,8 +112,8 @@ func (c *Client) OrderSell(req *OrderRequest) (*OrderResponse, error) {
 
 // OrderModify sends a stock order correction request.
 // See Kiwoom API ID: kt10002
-func (c *Client) OrderModify(req *OrderModifyRequest) (*OrderModifyResponse, error) {
-	httpReq, err := c.newRequest(http.MethodPost, "/api/dostk/ordr", "kt10002", req)
+func (c *Client) OrderModify(ctx context.Context, req *OrderModifyRequest) (*OrderModifyResponse, error) {
+	httpReq, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/ordr", API_OrderModify, req)
 	if err != nil {
 		return nil, err
 	}
@@ -124,8 +126,8 @@ func (c *Client) OrderModify(req *OrderModifyRequest) (*OrderModifyResponse, err
 
 // OrderCancel sends a stock order cancellation request.
 // See Kiwoom API ID: kt10003
-func (c *Client) OrderCancel(req *OrderCancelRequest) (*OrderCancelResponse, error) {
-	httpReq, err := c.newRequest(http.MethodPost, "/api/dostk/ordr", "kt10003", req)
+func (c *Client) OrderCancel(ctx context.Context, req *OrderCancelRequest) (*OrderCancelResponse, error) {
+	httpReq, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/ordr", API_OrderCancel, req)
 	if err != nil {
 		return nil, err
 	}
@@ -138,8 +140,8 @@ func (c *Client) OrderCancel(req *OrderCancelRequest) (*OrderCancelResponse, err
 
 // CreditOrderBuy sends a credit buy order.
 // See Kiwoom API ID: kt10006
-func (c *Client) CreditOrderBuy(req *CreditOrderRequest) (*OrderResponse, error) {
-	httpReq, err := c.newRequest(http.MethodPost, "/api/dostk/crdordr", "kt10006", req)
+func (c *Client) CreditOrderBuy(ctx context.Context, req *CreditOrderRequest) (*OrderResponse, error) {
+	httpReq, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/crdordr", API_CreditOrderBuy, req)
 	if err != nil {
 		return nil, err
 	}
@@ -152,8 +154,8 @@ func (c *Client) CreditOrderBuy(req *CreditOrderRequest) (*OrderResponse, error)
 
 // CreditOrderSell sends a credit sell order.
 // See Kiwoom API ID: kt10007
-func (c *Client) CreditOrderSell(req *CreditSellRequest) (*OrderResponse, error) {
-	httpReq, err := c.newRequest(http.MethodPost, "/api/dostk/crdordr", "kt10007", req)
+func (c *Client) CreditOrderSell(ctx context.Context, req *CreditSellRequest) (*OrderResponse, error) {
+	httpReq, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/crdordr", API_CreditOrderSell, req)
 	if err != nil {
 		return nil, err
 	}
@@ -166,8 +168,8 @@ func (c *Client) CreditOrderSell(req *CreditSellRequest) (*OrderResponse, error)
 
 // CreditOrderModify sends a credit order correction request.
 // See Kiwoom API ID: kt10008
-func (c *Client) CreditOrderModify(req *OrderModifyRequest) (*OrderModifyResponse, error) {
-	httpReq, err := c.newRequest(http.MethodPost, "/api/dostk/crdordr", "kt10008", req)
+func (c *Client) CreditOrderModify(ctx context.Context, req *OrderModifyRequest) (*OrderModifyResponse, error) {
+	httpReq, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/crdordr", API_CreditModify, req)
 	if err != nil {
 		return nil, err
 	}
@@ -180,8 +182,8 @@ func (c *Client) CreditOrderModify(req *OrderModifyRequest) (*OrderModifyRespons
 
 // CreditOrderCancel sends a credit order cancellation request.
 // See Kiwoom API ID: kt10009
-func (c *Client) CreditOrderCancel(req *OrderCancelRequest) (*OrderCancelResponse, error) {
-	httpReq, err := c.newRequest(http.MethodPost, "/api/dostk/crdordr", "kt10009", req)
+func (c *Client) CreditOrderCancel(ctx context.Context, req *OrderCancelRequest) (*OrderCancelResponse, error) {
+	httpReq, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/crdordr", API_CreditCancel, req)
 	if err != nil {
 		return nil, err
 	}

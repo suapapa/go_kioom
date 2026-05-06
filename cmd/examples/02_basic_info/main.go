@@ -1,11 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/suapapa/go_kioom"
+	kioom "github.com/suapapa/go_kioom"
 	"github.com/suapapa/go_kioom/internal/kioomenv"
 )
 
@@ -15,17 +16,18 @@ func main() {
 		log.Fatal(err)
 	}
 
-	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, true) // 모의투자 사용
+	ctx := context.Background()
+	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, kioom.WithMockDomain()) // 모의투자 사용
 
 	// 토큰 발급
-	_, err := client.IssueToken()
+	_, err := client.IssueToken(ctx)
 	if err != nil {
 		log.Fatalf("토큰 발급 실패: %v", err)
 	}
 
 	// 1. 계좌번호 조회
 	fmt.Println("\n--- 계좌 정보 조회 ---")
-	acctRes, err := client.GetAccountNumber()
+	acctRes, err := client.GetAccountNumber(ctx)
 	if err != nil {
 		log.Printf("계좌번호 조회 실패: %v", err)
 	} else {
@@ -35,7 +37,7 @@ func main() {
 
 	// 2. 주식 기본정보 조회 (삼성전자: 005930)
 	fmt.Println("\n--- 주식 기본 정보 조회 (삼성전자) ---")
-	stockRes, err := client.GetStockBasicInfo("005930")
+	stockRes, err := client.GetStockBasicInfo(ctx, "005930")
 	if err != nil {
 		log.Printf("주식정보 조회 실패: %v", err)
 	} else {
@@ -47,7 +49,7 @@ func main() {
 
 	// 3. 실시간 종목 조회 순위 (당일 누적: 4)
 	fmt.Println("\n--- 실시간 종목 조회 순위 (TOP 10) ---")
-	rankRes, err := client.GetRealtimeStockRank("4")
+	rankRes, err := client.GetRealtimeStockRank(ctx, "4")
 	if err != nil {
 		log.Printf("실시간 순위 조회 실패: %v", err)
 	} else {

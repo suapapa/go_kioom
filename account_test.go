@@ -1,6 +1,7 @@
 package kioom
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -17,10 +18,10 @@ func TestGetAccountNumber(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := NewClient("app", "sec", true)
-	client.BaseURL = server.URL
+	client := NewClient("app", "sec", WithMockDomain())
+	client.baseURL = server.URL
 
-	res, err := client.GetAccountNumber()
+	res, err := client.GetAccountNumber(context.Background())
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -42,10 +43,10 @@ func TestGetDeposit(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := NewClient("app", "sec", true)
-	client.BaseURL = server.URL
+	client := NewClient("app", "sec", WithMockDomain())
+	client.baseURL = server.URL
 
-	res, err := client.GetDeposit(&DepositRequest{QryTp: "2"})
+	res, err := client.GetDeposit(context.Background(), &DepositRequest{QryTp: "2"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -72,10 +73,10 @@ func TestGetAccountBalance(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := NewClient("app", "sec", true)
-	client.BaseURL = server.URL
+	client := NewClient("app", "sec", WithMockDomain())
+	client.baseURL = server.URL
 
-	res, err := client.GetAccountBalance(&AccountBalanceRequest{QryTp: "1", DmstStkTP: "KRX"})
+	res, err := client.GetAccountBalance(context.Background(), &AccountBalanceRequest{QryTp: "1", DmstStkTP: "KRX"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

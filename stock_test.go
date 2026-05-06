@@ -1,6 +1,7 @@
 package kioom
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -18,10 +19,10 @@ func TestGetStockBasicInfo(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := NewClient("app", "sec", true)
-	client.BaseURL = server.URL
+	client := NewClient("app", "sec", WithMockDomain())
+	client.baseURL = server.URL
 
-	res, err := client.GetStockBasicInfo("005930")
+	res, err := client.GetStockBasicInfo(context.Background(), "005930")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -46,10 +47,10 @@ func TestGetRealtimeStockRank(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := NewClient("app", "sec", true)
-	client.BaseURL = server.URL
+	client := NewClient("app", "sec", WithMockDomain())
+	client.baseURL = server.URL
 
-	res, err := client.GetRealtimeStockRank("1")
+	res, err := client.GetRealtimeStockRank(context.Background(), "1")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

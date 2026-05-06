@@ -44,7 +44,7 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 		Name:        "auth_issue",
 		Description: "Issue a new OAuth access token (Kiwoom au10001). Token is stored on the client for subsequent calls.",
 	}, func(ctx context.Context, req *mcp.CallToolRequest, _ noArgs) (*mcp.CallToolResult, *kioom.TokenResponse, error) {
-		res, err := c.IssueToken()
+		res, err := c.IssueToken(ctx)
 		return nil, res, err
 	})
 
@@ -52,7 +52,7 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 		Name:        "auth_revoke",
 		Description: "Revoke the current access token (Kiwoom au10002).",
 	}, func(ctx context.Context, req *mcp.CallToolRequest, _ noArgs) (*mcp.CallToolResult, *kioom.RevokeResponse, error) {
-		res, err := c.RevokeToken()
+		res, err := c.RevokeToken(ctx)
 		return nil, res, err
 	})
 
@@ -60,7 +60,7 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 		Name:        "account_number",
 		Description: "Get the account number.",
 	}, func(ctx context.Context, req *mcp.CallToolRequest, _ noArgs) (*mcp.CallToolResult, *kioom.AccountResponse, error) {
-		res, err := c.GetAccountNumber()
+		res, err := c.GetAccountNumber(ctx)
 		return nil, res, err
 	})
 
@@ -71,7 +71,7 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 		if err := kioomvalidate.ValidateDepositRequest(&in); err != nil {
 			return nil, nil, err
 		}
-		res, err := c.GetDeposit(&in)
+		res, err := c.GetDeposit(ctx, &in)
 		return nil, res, err
 	})
 
@@ -82,7 +82,7 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 		if err := kioomvalidate.ValidateAccountBalanceRequest(&in); err != nil {
 			return nil, nil, err
 		}
-		res, err := c.GetAccountBalance(&in)
+		res, err := c.GetAccountBalance(ctx, &in)
 		return nil, res, err
 	})
 
@@ -95,7 +95,7 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 		if err := kioomvalidate.ValidateStockCode(in.StkCd); err != nil {
 			return nil, nil, err
 		}
-		res, err := c.GetStockBasicInfo(in.StkCd)
+		res, err := c.GetStockBasicInfo(ctx, in.StkCd)
 		return nil, res, err
 	})
 
@@ -106,7 +106,7 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 		if err := kioomvalidate.ValidateRankRequest(&in); err != nil {
 			return nil, nil, err
 		}
-		res, err := c.GetRealtimeStockRank(in.QryTp)
+		res, err := c.GetRealtimeStockRank(ctx, in.QryTp)
 		return nil, res, err
 	})
 
@@ -117,7 +117,7 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 		if err := kioomvalidate.ValidateMinuteChartRequest(&in); err != nil {
 			return nil, nil, err
 		}
-		res, err := c.GetStockMinuteChart(&in)
+		res, err := c.GetStockMinuteChart(ctx, &in)
 		return nil, res, err
 	})
 
@@ -128,7 +128,7 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 		if err := kioomvalidate.ValidateOrderRequest(&in); err != nil {
 			return nil, nil, err
 		}
-		res, err := c.OrderBuy(&in)
+		res, err := c.OrderBuy(ctx, &in)
 		return nil, res, err
 	})
 
@@ -139,7 +139,7 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 		if err := kioomvalidate.ValidateOrderRequest(&in); err != nil {
 			return nil, nil, err
 		}
-		res, err := c.OrderSell(&in)
+		res, err := c.OrderSell(ctx, &in)
 		return nil, res, err
 	})
 
@@ -150,7 +150,7 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 		if err := kioomvalidate.ValidateOrderModifyRequest(&in); err != nil {
 			return nil, nil, err
 		}
-		res, err := c.OrderModify(&in)
+		res, err := c.OrderModify(ctx, &in)
 		return nil, res, err
 	})
 
@@ -161,7 +161,7 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 		if err := kioomvalidate.ValidateOrderCancelRequest(&in); err != nil {
 			return nil, nil, err
 		}
-		res, err := c.OrderCancel(&in)
+		res, err := c.OrderCancel(ctx, &in)
 		return nil, res, err
 	})
 }

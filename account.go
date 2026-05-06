@@ -1,6 +1,9 @@
 package kioom
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+)
 
 // AccountResponse contains information about the user's trading account number.
 type AccountResponse struct {
@@ -12,8 +15,8 @@ type AccountResponse struct {
 // GetAccountNumber retrieves the account number associated with the current session.
 // This requires a valid access token to be set on the client.
 // See Kiwoom API ID: ka00001
-func (c *Client) GetAccountNumber() (*AccountResponse, error) {
-	req, err := c.newRequest(http.MethodPost, "/api/dostk/acnt", "ka00001", map[string]interface{}{})
+func (c *Client) GetAccountNumber(ctx context.Context) (*AccountResponse, error) {
+	req, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/acnt", API_GetAccountNumber, map[string]interface{}{})
 	if err != nil {
 		return nil, err
 	}
@@ -45,8 +48,8 @@ type DepositResponse struct {
 
 // GetDeposit retrieves the deposit information for the account.
 // See Kiwoom API ID: kt00001
-func (c *Client) GetDeposit(req *DepositRequest) (*DepositResponse, error) {
-	httpReq, err := c.newRequest(http.MethodPost, "/api/dostk/acnt", "kt00001", req)
+func (c *Client) GetDeposit(ctx context.Context, req *DepositRequest) (*DepositResponse, error) {
+	httpReq, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/acnt", API_GetDeposit, req)
 	if err != nil {
 		return nil, err
 	}
@@ -94,8 +97,8 @@ type AccountBalanceItem struct {
 
 // GetAccountBalance retrieves the account balance information including stock items.
 // See Kiwoom API ID: kt00018
-func (c *Client) GetAccountBalance(req *AccountBalanceRequest) (*AccountBalanceResponse, error) {
-	httpReq, err := c.newRequest(http.MethodPost, "/api/dostk/acnt", "kt00018", req)
+func (c *Client) GetAccountBalance(ctx context.Context, req *AccountBalanceRequest) (*AccountBalanceResponse, error) {
+	httpReq, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/acnt", API_GetAccountBalance, req)
 	if err != nil {
 		return nil, err
 	}

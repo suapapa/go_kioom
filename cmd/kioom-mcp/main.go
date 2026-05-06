@@ -40,7 +40,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, cfg.Mock)
+	var opts []kioom.Option
+	if cfg.Mock {
+		opts = append(opts, kioom.WithMockDomain())
+	}
+	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, opts...)
 	if cfg.Token != "" {
 		client.SetToken(cfg.Token)
 	}

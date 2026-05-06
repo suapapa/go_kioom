@@ -2,11 +2,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/suapapa/go_kioom"
+	kioom "github.com/suapapa/go_kioom"
 	"github.com/suapapa/go_kioom/internal/kioomenv"
 )
 
@@ -16,11 +17,13 @@ func main() {
 		log.Fatal(err)
 	}
 
+	ctx := context.Background()
+
 	// Use mock domain for testing if needed
-	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, true)
+	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, kioom.WithMockDomain())
 
 	// 2. Obtain an access token
-	tokenRes, err := client.IssueToken()
+	tokenRes, err := client.IssueToken(ctx)
 	if err != nil {
 		log.Fatalf("Failed to get access token: %v", err)
 	}
@@ -36,7 +39,7 @@ func main() {
 		TrdeTp:     "3", // Market Price
 	}
 
-	buyRes, err := client.OrderBuy(buyReq)
+	buyRes, err := client.OrderBuy(ctx, buyReq)
 	if err != nil {
 		log.Fatalf("Failed to send buy order: %v", err)
 	}
@@ -60,7 +63,7 @@ func main() {
 		CrdLoanDt:  "20231001", // Example loan date
 	}
 
-	creditRes, err := client.CreditOrderSell(creditSellReq)
+	creditRes, err := client.CreditOrderSell(ctx, creditSellReq)
 	if err != nil {
 		log.Printf("Credit sell order failed as expected (or due to error): %v\n", err)
 	} else {

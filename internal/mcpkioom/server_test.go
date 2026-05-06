@@ -11,7 +11,7 @@ import (
 func TestNewServerToolCatalog(t *testing.T) {
 	t.Parallel()
 
-	client := kioom.NewClient("app", "sec", true)
+	client := kioom.NewClient("app", "sec", kioom.WithMockDomain())
 	server := NewServer(client, &mcp.Implementation{Name: "test-kioom", Version: "0.0.1"}, nil)
 
 	ct, st := mcp.NewInMemoryTransports()
@@ -38,7 +38,7 @@ func TestNewServerToolCatalog(t *testing.T) {
 func TestStockBasicInvalidCodeIsToolError(t *testing.T) {
 	t.Parallel()
 
-	client := kioom.NewClient("app", "sec", true)
+	client := kioom.NewClient("app", "sec", kioom.WithMockDomain())
 	server := NewServer(client, &mcp.Implementation{Name: "test-kioom", Version: "0.0.1"}, nil)
 
 	ct, st := mcp.NewInMemoryTransports()

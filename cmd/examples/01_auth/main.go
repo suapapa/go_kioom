@@ -1,11 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/suapapa/go_kioom"
+	kioom "github.com/suapapa/go_kioom"
 	"github.com/suapapa/go_kioom/internal/kioomenv"
 )
 
@@ -15,14 +16,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	useMock := true // 모의투자 환경 사용 여부
+	ctx := context.Background()
 
 	// 1. 클라이언트 생성
-	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, useMock)
+	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, kioom.WithMockDomain())
 
 	// 2. 접근토큰 발급 (자동으로 client.Token에 저장됨)
 	log.Println("접근토큰 발급을 요청합니다...")
-	tokenRes, err := client.IssueToken()
+	tokenRes, err := client.IssueToken(ctx)
 	if err != nil {
 		log.Fatalf("토큰 발급 실패: %v", err)
 	}
@@ -31,7 +32,7 @@ func main() {
 
 	// 3. 접근토큰 폐기
 	log.Println("발급받은 토큰을 폐기합니다...")
-	_, err = client.RevokeToken()
+	_, err = client.RevokeToken(ctx)
 	if err != nil {
 		log.Printf("⚠️ 토큰 폐기 실패: %v", err)
 	} else {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -69,7 +70,11 @@ func run(args []string, stdout io.Writer, stderr io.Writer, getenv envGetter) in
 		return 2
 	}
 
-	client := kioom.NewClient(cfg.appKey, cfg.secretKey, cfg.mock)
+	var opts []kioom.Option
+	if cfg.mock {
+		opts = append(opts, kioom.WithMockDomain())
+	}
+	client := kioom.NewClient(cfg.appKey, cfg.secretKey, opts...)
 	if cfg.token != "" {
 		client.SetToken(cfg.token)
 	}
@@ -150,7 +155,7 @@ func requireCredentials(cfg globalConfig) error {
 }
 
 func cmdAuthIssue(c *kioom.Client, output string, _ []string, w io.Writer) error {
-	res, err := c.IssueToken()
+	res, err := c.IssueToken(context.Background())
 	if err != nil {
 		return err
 	}
@@ -158,7 +163,7 @@ func cmdAuthIssue(c *kioom.Client, output string, _ []string, w io.Writer) error
 }
 
 func cmdAuthRevoke(c *kioom.Client, output string, _ []string, w io.Writer) error {
-	res, err := c.RevokeToken()
+	res, err := c.RevokeToken(context.Background())
 	if err != nil {
 		return err
 	}
@@ -166,7 +171,7 @@ func cmdAuthRevoke(c *kioom.Client, output string, _ []string, w io.Writer) erro
 }
 
 func cmdAccountNumber(c *kioom.Client, output string, _ []string, w io.Writer) error {
-	res, err := c.GetAccountNumber()
+	res, err := c.GetAccountNumber(context.Background())
 	if err != nil {
 		return err
 	}
@@ -181,7 +186,7 @@ func cmdAccountDeposit(c *kioom.Client, output string, args []string, w io.Write
 	if err := kioomvalidate.ValidateDepositRequest(&req); err != nil {
 		return err
 	}
-	res, err := c.GetDeposit(&req)
+	res, err := c.GetDeposit(context.Background(), &req)
 	if err != nil {
 		return err
 	}
@@ -196,7 +201,7 @@ func cmdAccountBalance(c *kioom.Client, output string, args []string, w io.Write
 	if err := kioomvalidate.ValidateAccountBalanceRequest(&req); err != nil {
 		return err
 	}
-	res, err := c.GetAccountBalance(&req)
+	res, err := c.GetAccountBalance(context.Background(), &req)
 	if err != nil {
 		return err
 	}
@@ -211,7 +216,7 @@ func cmdStockBasic(c *kioom.Client, output string, args []string, w io.Writer) e
 	if err := kioomvalidate.ValidateStockCode(req.StkCd); err != nil {
 		return err
 	}
-	res, err := c.GetStockBasicInfo(req.StkCd)
+	res, err := c.GetStockBasicInfo(context.Background(), req.StkCd)
 	if err != nil {
 		return err
 	}
@@ -226,7 +231,7 @@ func cmdStockRank(c *kioom.Client, output string, args []string, w io.Writer) er
 	if err := kioomvalidate.ValidateRankRequest(&req); err != nil {
 		return err
 	}
-	res, err := c.GetRealtimeStockRank(req.QryTp)
+	res, err := c.GetRealtimeStockRank(context.Background(), req.QryTp)
 	if err != nil {
 		return err
 	}
@@ -241,7 +246,7 @@ func cmdStockMinuteChart(c *kioom.Client, output string, args []string, w io.Wri
 	if err := kioomvalidate.ValidateMinuteChartRequest(&req); err != nil {
 		return err
 	}
-	res, err := c.GetStockMinuteChart(&req)
+	res, err := c.GetStockMinuteChart(context.Background(), &req)
 	if err != nil {
 		return err
 	}
@@ -256,7 +261,7 @@ func cmdOrderBuy(c *kioom.Client, output string, args []string, w io.Writer) err
 	if err := kioomvalidate.ValidateOrderRequest(&req); err != nil {
 		return err
 	}
-	res, err := c.OrderBuy(&req)
+	res, err := c.OrderBuy(context.Background(), &req)
 	if err != nil {
 		return err
 	}
@@ -271,7 +276,7 @@ func cmdOrderSell(c *kioom.Client, output string, args []string, w io.Writer) er
 	if err := kioomvalidate.ValidateOrderRequest(&req); err != nil {
 		return err
 	}
-	res, err := c.OrderSell(&req)
+	res, err := c.OrderSell(context.Background(), &req)
 	if err != nil {
 		return err
 	}
@@ -286,7 +291,7 @@ func cmdOrderModify(c *kioom.Client, output string, args []string, w io.Writer) 
 	if err := kioomvalidate.ValidateOrderModifyRequest(&req); err != nil {
 		return err
 	}
-	res, err := c.OrderModify(&req)
+	res, err := c.OrderModify(context.Background(), &req)
 	if err != nil {
 		return err
 	}
@@ -301,7 +306,7 @@ func cmdOrderCancel(c *kioom.Client, output string, args []string, w io.Writer) 
 	if err := kioomvalidate.ValidateOrderCancelRequest(&req); err != nil {
 		return err
 	}
-	res, err := c.OrderCancel(&req)
+	res, err := c.OrderCancel(context.Background(), &req)
 	if err != nil {
 		return err
 	}

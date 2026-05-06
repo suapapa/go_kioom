@@ -1,6 +1,7 @@
 package kioom
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -25,10 +26,10 @@ func TestIssueToken(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := NewClient("app", "sec", true)
-	client.BaseURL = server.URL
+	client := NewClient("app", "sec", WithMockDomain())
+	client.baseURL = server.URL
 
-	res, err := client.IssueToken()
+	res, err := client.IssueToken(context.Background())
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -37,8 +38,8 @@ func TestIssueToken(t *testing.T) {
 		t.Errorf("expected token new-auth-token, got %s", res.Token)
 	}
 
-	if client.Token != "new-auth-token" {
-		t.Errorf("expected client token to be updated, got %s", client.Token)
+	if client.Token() != "new-auth-token" {
+		t.Errorf("expected client token to be updated, got %s", client.Token())
 	}
 }
 
@@ -52,11 +53,11 @@ func TestRevokeToken(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := NewClient("app", "sec", true)
-	client.BaseURL = server.URL
-	client.Token = "old-token"
+	client := NewClient("app", "sec", WithMockDomain())
+	client.baseURL = server.URL
+	client.SetToken("old-token")
 
-	res, err := client.RevokeToken()
+	res, err := client.RevokeToken(context.Background())
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -65,7 +66,7 @@ func TestRevokeToken(t *testing.T) {
 		t.Errorf("expected ReturnCode 0, got %d", res.ReturnCode)
 	}
 
-	if client.Token != "" {
-		t.Errorf("expected client token to be cleared, got %s", client.Token)
+	if client.Token() != "" {
+		t.Errorf("expected client token to be cleared, got %s", client.Token())
 	}
 }
