@@ -76,7 +76,7 @@ Any new user-facing capability in the library should land with corresponding upd
 ## 🎨 Aesthetic Standards for AI Agents
 
 When acting as an agent on this project, ensure:
-1.  **Rich Context**: Before implementing, check `kiwoom_api.txt` or related specifications to ensure field names and types are accurate.
+1.  **Rich Context**: Before implementing, check `_ref/kioom_rest_api.md` (readable spec) or `_ref/kioom_rest_api.json` (structured export), plus any other `_ref/` materials, to ensure field names and types are accurate.
 2.  **Self-Correction**: If you notice a pattern mismatch (e.g., inconsistent error naming), proactively fix it to align with the rest of the project.
 3.  **WOW Factor**: Don't just implement the minimum. Provide a helpful example or a robust test case that proves the implementation works.
 4.  **Documentation Maintenance**: Proactively update `AGENTS.md` and `README.md` when new patterns, features, or significant changes are introduced to keep the documentation in sync with the codebase.
@@ -92,7 +92,7 @@ When acting as an agent on this project, ensure:
 -   `internal/kioomvalidate/`: Shared field validations for CLI and MCP tool handlers.
 -   `internal/kioomenv/`: Shared `KIOOM_*` environment loading for `kioom-cli`, `kioom-mcp`, and `cmd/examples/*`.
 -   `cmd/examples/`: Practical, runnable examples for users.
--   `_ref/`: (Optional) Reference documents or original API specs.
+-   `_ref/`: (Optional) Reference documents or original API specs; primary copies include `kioom_rest_api.md` and `kioom_rest_api.json`.
 -   `.agents/`: Custom AI instructions and skills (e.g., `golang-pro`).
 
 ---
