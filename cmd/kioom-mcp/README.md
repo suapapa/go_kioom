@@ -31,6 +31,7 @@ go build -o bin/kioom-mcp ./cmd/kioom-mcp
 | `KIOOM_SECRET_KEY` | 시크릿 키 (**필수**) |
 | `KIOOM_TOKEN` | 이미 발급된 Bearer 토큰이 있으면 설정 (선택) |
 | `KIOOM_MOCK` | `true`이면 모의투자(mock) API 도메인 사용 |
+| `KIOOM_MCP_SSE_TOKEN` | SSE 클라이언트 인증에 사용할 Bearer 토큰 (선택) |
 
 `KIOOM_APP_KEY`와 `KIOOM_SECRET_KEY`가 없으면 프로세스는 즉시 종료됩니다.
 
@@ -41,6 +42,7 @@ go build -o bin/kioom-mcp ./cmd/kioom-mcp
 | `-transport` | `stdio` | `stdio` 또는 `sse` |
 | `-listen` | `127.0.0.1:8765` | `-transport=sse`일 때 `host:port` |
 | `-sse-path` | `/` | SSE 핸들러를 붙일 URL 경로. 루트가 아니면 내부에서 끝에 `/`가 붙을 수 있음(Go 1.22+ `ServeMux` 서브트리 매칭) |
+| `-sse-token` | (환경변수값) | SSE 클라이언트 인증용 Bearer 토큰. 설정 시 클라이언트는 HTTP Header (`Authorization: Bearer <토큰>`) 또는 URL 쿼리 파라미터 (`?token=<토큰>` 또는 `?auth=<토큰>`)를 제공해야 합니다. |
 
 SIGINT/SIGTERM으로 종료하면 **SSE 모드**에서는 `http.Server.Shutdown`으로 정리합니다(최대 10초).
 
@@ -84,8 +86,26 @@ Claude Desktop 등 MCP 설정 예시(개념):
 export KIOOM_APP_KEY="..."
 export KIOOM_SECRET_KEY="..."
 
+# 인증 토큰 없이 SSE 구동
 kioom-mcp -transport sse -listen 127.0.0.1:8765 -sse-path /
+
+# 인증 토큰을 지정하여 SSE 구동
+kioom-mcp -transport sse -listen 127.0.0.1:8765 -sse-path / -sse-token "my-secret-token"
 ```
+
+인증 토큰이 설정된 경우, 클라이언트는 다음과 같이 인증하여 접근해야 합니다:
+
+1. **HTTP Header (추천)**:
+   ```bash
+   curl -I -H "Authorization: Bearer my-secret-token" http://127.0.0.1:8765/
+   ```
+
+2. **URL Query Parameter (EventSource 등 헤더 설정이 제한될 때)**:
+   ```bash
+   curl -I "http://127.0.0.1:8765/?token=my-secret-token"
+   # 또는
+   curl -I "http://127.0.0.1:8765/?auth=my-secret-token"
+   ```
 
 클라이언트는 이 엔드포인트에 대해 MCP SSE 규격(세션 `GET`, 메시지 `POST` 등)을 지원해야 합니다. 로컬이 아닌 주소로 노출할 때는 방화벽·TLS·인증을 반드시 고려하세요.
 

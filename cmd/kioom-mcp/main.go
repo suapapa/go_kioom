@@ -32,6 +32,7 @@ func main() {
 	transport := flag.String("transport", "stdio", "Transport: stdio or sse")
 	listen := flag.String("listen", "127.0.0.1:8765", "Listen address for -transport=sse")
 	ssePath := flag.String("sse-path", "/", "HTTP path prefix for -transport=sse (non-root paths get a trailing / for POST session routing)")
+	sseToken := flag.String("sse-token", os.Getenv("KIOOM_MCP_SSE_TOKEN"), "Bearer token to authenticate incoming SSE client connections")
 
 	flag.Parse()
 
@@ -59,7 +60,7 @@ func main() {
 			log.Fatal(err)
 		}
 	case "sse":
-		if err := runSSE(srv, *listen, normalizeSSEPath(*ssePath)); err != nil {
+		if err := runSSE(srv, *listen, normalizeSSEPath(*ssePath), *sseToken); err != nil {
 			log.Fatal(err)
 		}
 	default:
@@ -75,10 +76,14 @@ func loadConfig() (kioomenv.Config, error) {
 	return c, nil
 }
 
-func runSSE(mcpsrv *mcp.Server, listenAddr, path string) error {
+func runSSE(mcpsrv *mcp.Server, listenAddr, path, token string) error {
 	h := mcp.NewSSEHandler(func(_ *http.Request) *mcp.Server { return mcpsrv }, nil)
 	mux := http.NewServeMux()
-	mux.Handle(path, h)
+	if token != "" {
+		mux.Handle(path, authMiddleware(token, h))
+	} else {
+		mux.Handle(path, h)
+	}
 
 	addr := strings.TrimSpace(listenAddr)
 	httpSrv := &http.Server{
@@ -112,6 +117,30 @@ func runSSE(mcpsrv *mcp.Server, listenAddr, path string) error {
 		}
 		return nil
 	}
+}
+
+func authMiddleware(token string, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		reqToken := ""
+		if strings.HasPrefix(strings.ToLower(authHeader), "bearer ") {
+			reqToken = authHeader[7:]
+		}
+
+		if reqToken == "" {
+			reqToken = r.URL.Query().Get("token")
+		}
+		if reqToken == "" {
+			reqToken = r.URL.Query().Get("auth")
+		}
+
+		if reqToken != token {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 type signalStop struct {
