@@ -3,7 +3,9 @@
 package kioomenv
 
 import (
+	"bufio"
 	"errors"
+	"os"
 	"strings"
 )
 
@@ -41,4 +43,51 @@ func (c Config) RequireAppKeys() error {
 		return ErrMissingCredentials
 	}
 	return nil
+}
+
+// LoadEnvFile reads a .env file from the specified path, parses KEY=VALUE pairs,
+// and sets them in the environment using os.Setenv if they are not already set.
+// If the file does not exist, it does nothing and returns nil.
+func LoadEnvFile(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		// Skip empty lines and comments
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+
+		key := strings.TrimSpace(parts[0])
+		val := strings.TrimSpace(parts[1])
+
+		// Strip quotes if present
+		if len(val) >= 2 {
+			if (strings.HasPrefix(val, "\"") && strings.HasSuffix(val, "\"")) ||
+				(strings.HasPrefix(val, "'") && strings.HasSuffix(val, "'")) {
+				val = val[1 : len(val)-1]
+			}
+		}
+
+		// Only set if not already set in the environment to allow env overrides
+		if os.Getenv(key) == "" {
+			if err := os.Setenv(key, val); err != nil {
+				return err
+			}
+		}
+	}
+	return scanner.Err()
 }

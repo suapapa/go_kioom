@@ -10,6 +10,7 @@ package main
 
 import (
 	"context"
+	"crypto/subtle"
 	"flag"
 	"log"
 	"net/http"
@@ -28,6 +29,11 @@ import (
 func main() {
 	log.SetPrefix("kioom-mcp: ")
 	log.SetFlags(0)
+
+	// Load environment variables from .env if present
+	if err := kioomenv.LoadEnvFile(".env"); err != nil {
+		log.Printf("warning: failed to load .env file: %v", err)
+	}
 
 	transport := flag.String("transport", "stdio", "Transport: stdio or sse")
 	listen := flag.String("listen", "127.0.0.1:8765", "Listen address for -transport=sse")
@@ -87,8 +93,12 @@ func runSSE(mcpsrv *mcp.Server, listenAddr, path, token string) error {
 
 	addr := strings.TrimSpace(listenAddr)
 	httpSrv := &http.Server{
-		Addr:    addr,
-		Handler: mux,
+		Addr:              addr,
+		Handler:           mux,
+		ReadHeaderTimeout: 3 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      15 * time.Second,
+		IdleTimeout:       30 * time.Second,
 	}
 
 	rootCtx := signalContext(context.Background())
@@ -134,7 +144,7 @@ func authMiddleware(token string, next http.Handler) http.Handler {
 			reqToken = r.URL.Query().Get("auth")
 		}
 
-		if reqToken != token {
+		if subtle.ConstantTimeCompare([]byte(reqToken), []byte(token)) != 1 {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}

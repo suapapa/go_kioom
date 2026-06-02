@@ -104,7 +104,9 @@ docker build -t kioom-mcp-sse -f cmd/kioom-mcp/Dockerfile .
 ```
 
 #### 2. 컨테이너 실행
-자격 증명 환경 변수를 넘겨서 로컬에서 빌드한 이미지를 실행합니다.
+자격 증명 환경 변수를 넘겨서 로컬에서 빌드한 이미지를 실행합니다. 다음 세 가지 방법 중 하나를 사용할 수 있습니다:
+
+##### 방법 A: 개별 환경 변수 지정 (`-e` 옵션)
 ```bash
 docker run -d \
   -p 8765:8765 \
@@ -116,15 +118,31 @@ docker run -d \
   kioom-mcp-sse
 ```
 
-#### 3. GitHub Container Registry (GHCR) 이미지 사용
-GitHub Actions를 통해 자동으로 빌드 및 배포되는 멀티 아키텍처(`amd64`, `arm64`) 공식 이미지를 직접 풀(pull)받아 실행할 수도 있습니다.
+##### 방법 B: `.env` 파일 전체 전달 (`--env-file` 옵션) - 추천 🌟
 ```bash
 docker run -d \
   -p 8765:8765 \
-  -e KIOOM_APP_KEY="your-app-key" \
-  -e KIOOM_SECRET_KEY="your-secret-key" \
-  -e KIOOM_MOCK="true" \
-  -e KIOOM_MCP_SSE_TOKEN="my-secret-token" \
+  --env-file .env \
+  --name kioom-mcp-container \
+  kioom-mcp-sse
+```
+
+##### 방법 C: `.env` 파일 볼륨 마운트 (`-v` 옵션)
+컨테이너의 작업 디렉터리 `/app/.env`에 호스트의 `.env` 파일을 마운트하여 실행합니다:
+```bash
+docker run -d \
+  -p 8765:8765 \
+  -v $(pwd)/.env:/app/.env \
+  --name kioom-mcp-container \
+  kioom-mcp-sse
+```
+
+#### 3. GitHub Container Registry (GHCR) 이미지 사용
+GitHub Actions를 통해 자동으로 빌드 및 배포되는 멀티 아키텍처(`amd64`, `arm64`) 공식 이미지를 직접 풀(pull)받아 실행할 수도 있습니다. 이 경우에도 `.env` 전달 방식을 권장합니다.
+```bash
+docker run -d \
+  -p 8765:8765 \
+  --env-file .env \
   --name kioom-mcp-container \
   ghcr.io/suapapa/go_kioom/kioom-mcp:latest
 ```

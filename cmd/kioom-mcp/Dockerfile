@@ -36,12 +36,11 @@ COPY --from=builder /kioom-mcp /app/kioom-mcp
 # 컨테이너 포트 노출 (SSE 기본 포트: 8765)
 EXPOSE 8765
 
-# 런타임에 필요한 환경 변수 템플릿
-ENV KIOOM_APP_KEY=""
-ENV KIOOM_SECRET_KEY=""
-ENV KIOOM_TOKEN=""
-ENV KIOOM_MOCK="false"
-ENV KIOOM_MCP_SSE_TOKEN=""
+# NOTE: 런타임 자격 증명(KIOOM_APP_KEY, KIOOM_SECRET_KEY 등)은 보안을 위해 Dockerfile에 
+# ENV/ARG로 하드코딩하지 않습니다. 대신 다음과 같은 방법으로 주입하십시오:
+#   1. 컨테이너 실행 시 환경 변수로 주입: -e KIOOM_APP_KEY="xxx" -e KIOOM_SECRET_KEY="xxx"
+#   2. 컨테이너 실행 시 .env 파일 주입: --env-file .env
+#   3. .env 파일을 컨테이너 /app/.env 경로에 볼륨 마운트: -v $(pwd)/.env:/app/.env
 
 # 컨테이너 환경에서는 호스트에서 바인딩을 허용하기 위해 listen 주소를 0.0.0.0으로 해야 합니다.
 ENTRYPOINT ["/app/kioom-mcp", "-transport", "sse", "-listen", "0.0.0.0:8765"]
