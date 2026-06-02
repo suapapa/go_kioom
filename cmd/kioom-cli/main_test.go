@@ -85,23 +85,29 @@ func TestParseGlobal(t *testing.T) {
 func TestRunSchema(t *testing.T) {
 	t.Parallel()
 
-	out := new(bytes.Buffer)
-	errOut := new(bytes.Buffer)
+	cases := []string{"stock.basic", "stock.tick-chart", "stock.daily-chart", "stock.weekly-chart", "stock.monthly-chart", "stock.yearly-chart"}
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc, func(t *testing.T) {
+			out := new(bytes.Buffer)
+			errOut := new(bytes.Buffer)
 
-	code := run([]string{"schema", "stock.basic"}, out, errOut, func(string) string { return "" })
-	if code != 0 {
-		t.Fatalf("run() exit code = %d, stderr=%s", code, errOut.String())
-	}
+			code := run([]string{"schema", tc}, out, errOut, func(string) string { return "" })
+			if code != 0 {
+				t.Fatalf("run() exit code = %d, stderr=%s", code, errOut.String())
+			}
 
-	body := out.String()
-	if !strings.Contains(body, `"ok":true`) {
-		t.Fatalf("expected ok envelope, got %s", body)
-	}
-	if !strings.Contains(body, `"command":"stock.basic"`) {
-		t.Fatalf("expected command path in body, got %s", body)
-	}
-	if !strings.Contains(body, `"stk_cd"`) {
-		t.Fatalf("expected stock schema field in body, got %s", body)
+			body := out.String()
+			if !strings.Contains(body, `"ok":true`) {
+				t.Fatalf("expected ok envelope, got %s", body)
+			}
+			if !strings.Contains(body, `"command":"`+tc+`"`) {
+				t.Fatalf("expected command path in body, got %s", body)
+			}
+			if !strings.Contains(body, `"stk_cd"`) {
+				t.Fatalf("expected stock schema field in body, got %s", body)
+			}
+		})
 	}
 }
 

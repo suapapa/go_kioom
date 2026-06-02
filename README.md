@@ -68,6 +68,8 @@ func main() {
 - `02_basic_info`: 주식 기본 정보 및 실시간 검색 순위 조회
 - `03_monitor`: 계좌 현황 모니터링
 - `04_trading`: 주식/신용 매수, 매도, 정정 및 취소 주문
+- `05_minute_chart`: 주식 분봉 차트 조회
+
 
 ## CLI (`kioom-cli`)
 

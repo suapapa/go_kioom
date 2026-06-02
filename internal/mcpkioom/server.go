@@ -111,6 +111,17 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 	})
 
 	mcp.AddTool(s, &mcp.Tool{
+		Name:        "stock_tick_chart",
+		Description: "Tick chart; body matches kioom.StockTickChartRequest.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in kioom.StockTickChartRequest) (*mcp.CallToolResult, *kioom.StockTickChartResponse, error) {
+		if err := kioomvalidate.ValidateTickChartRequest(&in); err != nil {
+			return nil, nil, err
+		}
+		res, err := c.GetStockTickChart(ctx, &in)
+		return nil, res, err
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
 		Name:        "stock_minute_chart",
 		Description: "Minute chart; body matches kioom.StockMinuteChartRequest.",
 	}, func(ctx context.Context, req *mcp.CallToolRequest, in kioom.StockMinuteChartRequest) (*mcp.CallToolResult, *kioom.StockMinuteChartResponse, error) {
@@ -118,6 +129,50 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 			return nil, nil, err
 		}
 		res, err := c.GetStockMinuteChart(ctx, &in)
+		return nil, res, err
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "stock_daily_chart",
+		Description: "Daily chart; body matches kioom.StockChartRequest.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in kioom.StockChartRequest) (*mcp.CallToolResult, *kioom.StockDailyChartResponse, error) {
+		if err := kioomvalidate.ValidateChartRequest(&in); err != nil {
+			return nil, nil, err
+		}
+		res, err := c.GetStockDailyChart(ctx, &in)
+		return nil, res, err
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "stock_weekly_chart",
+		Description: "Weekly chart; body matches kioom.StockChartRequest.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in kioom.StockChartRequest) (*mcp.CallToolResult, *kioom.StockWeeklyChartResponse, error) {
+		if err := kioomvalidate.ValidateChartRequest(&in); err != nil {
+			return nil, nil, err
+		}
+		res, err := c.GetStockWeeklyChart(ctx, &in)
+		return nil, res, err
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "stock_monthly_chart",
+		Description: "Monthly chart; body matches kioom.StockChartRequest.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in kioom.StockChartRequest) (*mcp.CallToolResult, *kioom.StockMonthlyChartResponse, error) {
+		if err := kioomvalidate.ValidateChartRequest(&in); err != nil {
+			return nil, nil, err
+		}
+		res, err := c.GetStockMonthlyChart(ctx, &in)
+		return nil, res, err
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "stock_yearly_chart",
+		Description: "Yearly chart; body matches kioom.StockChartRequest.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in kioom.StockChartRequest) (*mcp.CallToolResult, *kioom.StockYearlyChartResponse, error) {
+		if err := kioomvalidate.ValidateChartRequest(&in); err != nil {
+			return nil, nil, err
+		}
+		res, err := c.GetStockYearlyChart(ctx, &in)
 		return nil, res, err
 	})
 

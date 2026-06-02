@@ -38,9 +38,14 @@ var catalog = map[string]map[string]commandFunc{
 		"balance": cmdAccountBalance,
 	},
 	"stock": {
-		"basic":        cmdStockBasic,
-		"rank":         cmdStockRank,
-		"minute-chart": cmdStockMinuteChart,
+		"basic":         cmdStockBasic,
+		"rank":          cmdStockRank,
+		"tick-chart":    cmdStockTickChart,
+		"minute-chart":  cmdStockMinuteChart,
+		"daily-chart":   cmdStockDailyChart,
+		"weekly-chart":  cmdStockWeeklyChart,
+		"monthly-chart": cmdStockMonthlyChart,
+		"yearly-chart":  cmdStockYearlyChart,
 	},
 	"order": {
 		"buy":    cmdOrderBuy,
@@ -238,6 +243,21 @@ func cmdStockRank(c *kioom.Client, output string, args []string, w io.Writer) er
 	return writeOK(w, output, res)
 }
 
+func cmdStockTickChart(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.StockTickChartRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateTickChartRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.GetStockTickChart(context.Background(), &req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
 func cmdStockMinuteChart(c *kioom.Client, output string, args []string, w io.Writer) error {
 	var req kioom.StockMinuteChartRequest
 	if err := parseJSONArg(args, &req); err != nil {
@@ -247,6 +267,66 @@ func cmdStockMinuteChart(c *kioom.Client, output string, args []string, w io.Wri
 		return err
 	}
 	res, err := c.GetStockMinuteChart(context.Background(), &req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdStockDailyChart(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.StockChartRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateChartRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.GetStockDailyChart(context.Background(), &req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdStockWeeklyChart(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.StockChartRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateChartRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.GetStockWeeklyChart(context.Background(), &req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdStockMonthlyChart(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.StockChartRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateChartRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.GetStockMonthlyChart(context.Background(), &req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdStockYearlyChart(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.StockChartRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateChartRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.GetStockYearlyChart(context.Background(), &req)
 	if err != nil {
 		return err
 	}

@@ -34,18 +34,23 @@ var commandSchemaMap = map[string]struct {
 	reqType  reflect.Type
 	respType reflect.Type
 }{
-	"auth.issue":         {nil, reflect.TypeOf(kioom.TokenResponse{})},
-	"auth.revoke":        {nil, reflect.TypeOf(kioom.RevokeResponse{})},
-	"account.number":     {nil, reflect.TypeOf(kioom.AccountResponse{})},
-	"account.deposit":    {reflect.TypeOf(kioom.DepositRequest{}), reflect.TypeOf(kioom.DepositResponse{})},
-	"account.balance":    {reflect.TypeOf(kioom.AccountBalanceRequest{}), reflect.TypeOf(kioom.AccountBalanceResponse{})},
-	"stock.basic":        {reflect.TypeOf(kioom.StockBasicInfoRequest{}), reflect.TypeOf(kioom.StockBasicInfoResponse{})},
-	"stock.rank":         {reflect.TypeOf(kioom.RealtimeItemRankRequest{}), reflect.TypeOf(kioom.RealtimeItemRankResponse{})},
-	"stock.minute-chart": {reflect.TypeOf(kioom.StockMinuteChartRequest{}), reflect.TypeOf(kioom.StockMinuteChartResponse{})},
-	"order.buy":          {reflect.TypeOf(kioom.OrderRequest{}), reflect.TypeOf(kioom.OrderResponse{})},
-	"order.sell":         {reflect.TypeOf(kioom.OrderRequest{}), reflect.TypeOf(kioom.OrderResponse{})},
-	"order.modify":       {reflect.TypeOf(kioom.OrderModifyRequest{}), reflect.TypeOf(kioom.OrderModifyResponse{})},
-	"order.cancel":       {reflect.TypeOf(kioom.OrderCancelRequest{}), reflect.TypeOf(kioom.OrderCancelResponse{})},
+	"auth.issue":          {nil, reflect.TypeOf(kioom.TokenResponse{})},
+	"auth.revoke":         {nil, reflect.TypeOf(kioom.RevokeResponse{})},
+	"account.number":      {nil, reflect.TypeOf(kioom.AccountResponse{})},
+	"account.deposit":     {reflect.TypeOf(kioom.DepositRequest{}), reflect.TypeOf(kioom.DepositResponse{})},
+	"account.balance":     {reflect.TypeOf(kioom.AccountBalanceRequest{}), reflect.TypeOf(kioom.AccountBalanceResponse{})},
+	"stock.basic":         {reflect.TypeOf(kioom.StockBasicInfoRequest{}), reflect.TypeOf(kioom.StockBasicInfoResponse{})},
+	"stock.rank":          {reflect.TypeOf(kioom.RealtimeItemRankRequest{}), reflect.TypeOf(kioom.RealtimeItemRankResponse{})},
+	"stock.tick-chart":    {reflect.TypeOf(kioom.StockTickChartRequest{}), reflect.TypeOf(kioom.StockTickChartResponse{})},
+	"stock.minute-chart":  {reflect.TypeOf(kioom.StockMinuteChartRequest{}), reflect.TypeOf(kioom.StockMinuteChartResponse{})},
+	"stock.daily-chart":   {reflect.TypeOf(kioom.StockChartRequest{}), reflect.TypeOf(kioom.StockDailyChartResponse{})},
+	"stock.weekly-chart":  {reflect.TypeOf(kioom.StockChartRequest{}), reflect.TypeOf(kioom.StockWeeklyChartResponse{})},
+	"stock.monthly-chart": {reflect.TypeOf(kioom.StockChartRequest{}), reflect.TypeOf(kioom.StockMonthlyChartResponse{})},
+	"stock.yearly-chart":  {reflect.TypeOf(kioom.StockChartRequest{}), reflect.TypeOf(kioom.StockYearlyChartResponse{})},
+	"order.buy":           {reflect.TypeOf(kioom.OrderRequest{}), reflect.TypeOf(kioom.OrderResponse{})},
+	"order.sell":          {reflect.TypeOf(kioom.OrderRequest{}), reflect.TypeOf(kioom.OrderResponse{})},
+	"order.modify":        {reflect.TypeOf(kioom.OrderModifyRequest{}), reflect.TypeOf(kioom.OrderModifyResponse{})},
+	"order.cancel":        {reflect.TypeOf(kioom.OrderCancelRequest{}), reflect.TypeOf(kioom.OrderCancelResponse{})},
 }
 
 func runSchema(args []string, stdout io.Writer, stderr io.Writer, output string) int {

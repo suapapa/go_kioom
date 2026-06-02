@@ -75,6 +75,46 @@ func ValidateMinuteChartRequest(req *kioom.StockMinuteChartRequest) error {
 	return nil
 }
 
+// ValidateTickChartRequest validates tick chart parameters.
+func ValidateTickChartRequest(req *kioom.StockTickChartRequest) error {
+	if err := ValidateStockCode(req.StkCd); err != nil {
+		return err
+	}
+
+	switch req.TicScope {
+	case "1", "3", "5", "10", "30":
+	default:
+		return fmt.Errorf("invalid tic_scope %q: expected one of [1,3,5,10,30]", req.TicScope)
+	}
+
+	switch req.UpdStkpcTp {
+	case "0", "1":
+	default:
+		return fmt.Errorf("invalid upd_stkpc_tp %q: expected one of [0,1]", req.UpdStkpcTp)
+	}
+
+	return nil
+}
+
+// ValidateChartRequest validates daily, weekly, monthly, and yearly chart parameters.
+func ValidateChartRequest(req *kioom.StockChartRequest) error {
+	if err := ValidateStockCode(req.StkCd); err != nil {
+		return err
+	}
+
+	if len(req.BaseDt) != 8 {
+		return fmt.Errorf("invalid base_dt %q: expected 8 characters (YYYYMMDD)", req.BaseDt)
+	}
+
+	switch req.UpdStkpcTp {
+	case "0", "1":
+	default:
+		return fmt.Errorf("invalid upd_stkpc_tp %q: expected one of [0,1]", req.UpdStkpcTp)
+	}
+
+	return nil
+}
+
 // ValidateOrderRequest validates a new order request.
 func ValidateOrderRequest(req *kioom.OrderRequest) error {
 	if err := ValidateStockCode(req.StkCd); err != nil {

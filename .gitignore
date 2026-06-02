@@ -1,4 +1,58 @@
-.gitignore
+# ==========================================
+# 🌊 Project "go_kioom" .gitignore
+# ==========================================
+
+# OS/System Files
 .DS_Store
+Thumbs.db
+
+# IDEs and Editors
+.idea/
+.vscode/
+.cursor/
+*.swp
+*.swo
+*~
+
+# AI Agent Specific / Local CLI
 .agents/
 skills-lock.json
+.antigravitycli/
+
+# Environment / Credentials (Kiwoom API Keys)
+.env
+.env.*
+*.env
+
+# Go Binaries and Executables
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+/cmd/kioom-cli/kioom-cli
+/cmd/kioom-mcp/kioom-mcp
+
+# Go examples build outputs (ignore all binaries but keep sources)
+/cmd/examples/*/*
+!/cmd/examples/*/*.go
+!/cmd/examples/*/*.md
+!/cmd/examples/*/*.json
+!/cmd/examples/*/*.yaml
+
+# Python (Virtualenv & Cache)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+ENV/
+.ipynb_checkpoints/
+
+# Script Generated Visualizations / Data
+/script/*.yaml
+/script/*.png

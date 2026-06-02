@@ -21,7 +21,12 @@ const (
 	// Stock Info
 	API_GetStockBasicInfo = "ka10001"
 	API_GetRealtimeRank   = "ka00198"
+	API_GetTickChart      = "ka10079"
 	API_GetMinuteChart    = "ka10080"
+	API_GetDailyChart     = "ka10081"
+	API_GetWeeklyChart    = "ka10082"
+	API_GetMonthlyChart   = "ka10083"
+	API_GetYearlyChart    = "ka10094"
 
 	// Orders
 	API_OrderBuy        = "kt10000"
