@@ -51,7 +51,7 @@ This document tracks the implementation progress of the Kiwoom REST API wrapper 
 - [ ] `ka10006` - 주식시분요청
 - [ ] `ka10007` - 시세표성정보요청
 - [ ] `ka10008` - 주식외국인종목별매매동향
-- [ ] `ka10009` - 주식기관요청
+- [x] `ka10009` - [주식기관요청](./stock.go#L368)
 - [ ] `ka10011` - 신주인수권전체시세요청
 - [ ] `ka10013` - 신용매매동향요청
 - [ ] `ka10014` - 공매도추이요청

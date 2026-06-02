@@ -47,6 +47,28 @@ func main() {
 		fmt.Printf("시가총액: %s\n", stockRes.Mac)
 	}
 
+	// 2-1. 주식 기업 분석 및 주요 지표 조회 (삼성전자: 005930)
+	fmt.Println("\n--- 주식 기업 분석 및 주요 지표 조회 (삼성전자) ---")
+	indicatorRes, err := client.GetStockIndicators(ctx, "005930")
+	if err != nil {
+		log.Printf("주식 지표 조회 실패: %v", err)
+	} else {
+		fmt.Printf("종목명: %s (%s)\n", indicatorRes.StkNm, indicatorRes.StkCd)
+		fmt.Printf("시가총액: %s억 원\n", indicatorRes.Mac)
+		fmt.Printf("PER: %s\n", indicatorRes.Per)
+		fmt.Printf("PBR: %s\n", indicatorRes.Pbr)
+		fmt.Printf("ROE: %s%%\n", indicatorRes.Roe)
+		fmt.Printf("52주일 최고가 대비 등락율: %s%%\n", indicatorRes.High250PricPreRt)
+		fmt.Printf("52주일 최저가 대비 등락율: %s%%\n", indicatorRes.Low250PricPreRt)
+		fmt.Printf("외인소진률: %s%%\n", indicatorRes.ForExhRt)
+		fmt.Printf("외국인지분율: %s%%\n", indicatorRes.ForQotaRt)
+		fmt.Printf("매출액: %s\n", indicatorRes.SaleAmt)
+		fmt.Printf("영업이익: %s\n", indicatorRes.BusPro)
+		fmt.Printf("당기순이익: %s\n", indicatorRes.CupNga)
+		fmt.Printf("영업이익률 (계산): %s\n", indicatorRes.OperatingMargin)
+		fmt.Printf("순이익률 (계산): %s\n", indicatorRes.NetProfitMargin)
+	}
+
 	// 3. 실시간 종목 조회 순위 (당일 누적: 4)
 	fmt.Println("\n--- 실시간 종목 조회 순위 (TOP 10) ---")
 	rankRes, err := client.GetRealtimeStockRank(ctx, "4")

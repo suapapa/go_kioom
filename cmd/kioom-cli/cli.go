@@ -39,6 +39,7 @@ var catalog = map[string]map[string]commandFunc{
 	},
 	"stock": {
 		"basic":         cmdStockBasic,
+		"indicators":    cmdStockIndicators,
 		"rank":          cmdStockRank,
 		"tick-chart":    cmdStockTickChart,
 		"minute-chart":  cmdStockMinuteChart,
@@ -222,6 +223,21 @@ func cmdStockBasic(c *kioom.Client, output string, args []string, w io.Writer) e
 		return err
 	}
 	res, err := c.GetStockBasicInfo(context.Background(), req.StkCd)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdStockIndicators(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.StockIndicatorRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateStockCode(req.StkCd); err != nil {
+		return err
+	}
+	res, err := c.GetStockIndicators(context.Background(), req.StkCd)
 	if err != nil {
 		return err
 	}

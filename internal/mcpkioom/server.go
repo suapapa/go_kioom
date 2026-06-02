@@ -100,6 +100,19 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 	})
 
 	mcp.AddTool(s, &mcp.Tool{
+		Name:        "stock_indicators",
+		Description: "Comprehensive fundamental stock indicators for stk_cd (six digits) including computed margins and exact foreign ownership ratio.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in struct {
+		StkCd string `json:"stk_cd" jsonschema:"required six-digit stock code"`
+	}) (*mcp.CallToolResult, *kioom.StockIndicatorResponse, error) {
+		if err := kioomvalidate.ValidateStockCode(in.StkCd); err != nil {
+			return nil, nil, err
+		}
+		res, err := c.GetStockIndicators(ctx, in.StkCd)
+		return nil, res, err
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
 		Name:        "stock_rank",
 		Description: "Realtime stock rank; body matches kioom.RealtimeItemRankRequest.",
 	}, func(ctx context.Context, req *mcp.CallToolRequest, in kioom.RealtimeItemRankRequest) (*mcp.CallToolResult, *kioom.RealtimeItemRankResponse, error) {

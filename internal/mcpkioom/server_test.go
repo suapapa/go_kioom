@@ -30,8 +30,8 @@ func TestNewServerToolCatalog(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ListTools: %v", err)
 	}
-	if got := len(res.Tools); got != 17 {
-		t.Fatalf("tool count: got %d want 17", got)
+	if got := len(res.Tools); got != 18 {
+		t.Fatalf("tool count: got %d want 18", got)
 	}
 }
 

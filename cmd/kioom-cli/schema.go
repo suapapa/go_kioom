@@ -40,6 +40,7 @@ var commandSchemaMap = map[string]struct {
 	"account.deposit":     {reflect.TypeOf(kioom.DepositRequest{}), reflect.TypeOf(kioom.DepositResponse{})},
 	"account.balance":     {reflect.TypeOf(kioom.AccountBalanceRequest{}), reflect.TypeOf(kioom.AccountBalanceResponse{})},
 	"stock.basic":         {reflect.TypeOf(kioom.StockBasicInfoRequest{}), reflect.TypeOf(kioom.StockBasicInfoResponse{})},
+	"stock.indicators":    {reflect.TypeOf(kioom.StockIndicatorRequest{}), reflect.TypeOf(kioom.StockIndicatorResponse{})},
 	"stock.rank":          {reflect.TypeOf(kioom.RealtimeItemRankRequest{}), reflect.TypeOf(kioom.RealtimeItemRankResponse{})},
 	"stock.tick-chart":    {reflect.TypeOf(kioom.StockTickChartRequest{}), reflect.TypeOf(kioom.StockTickChartResponse{})},
 	"stock.minute-chart":  {reflect.TypeOf(kioom.StockMinuteChartRequest{}), reflect.TypeOf(kioom.StockMinuteChartResponse{})},
