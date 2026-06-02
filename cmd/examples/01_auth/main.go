@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -11,6 +12,9 @@ import (
 )
 
 func main() {
+	mockFlag := flag.Bool("mock", false, "Use mock domain")
+	flag.Parse()
+
 	cfg := kioomenv.Load(os.Getenv)
 	if err := cfg.RequireAppKeys(); err != nil {
 		log.Fatal(err)
@@ -19,7 +23,11 @@ func main() {
 	ctx := context.Background()
 
 	// 1. 클라이언트 생성
-	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, kioom.WithMockDomain())
+	var opts []kioom.Option
+	if *mockFlag {
+		opts = append(opts, kioom.WithMockDomain())
+	}
+	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, opts...)
 
 	// 2. 접근토큰 발급 (자동으로 client.Token에 저장됨)
 	log.Println("접근토큰 발급을 요청합니다...")

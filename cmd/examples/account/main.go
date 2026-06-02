@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -11,6 +12,9 @@ import (
 )
 
 func main() {
+	mockFlag := flag.Bool("mock", false, "Use mock domain")
+	flag.Parse()
+
 	// For example purposes, we use environment variables for AppKey and SecretKey.
 	// In a real application, you should handle these securely.
 	cfg := kioomenv.Load(os.Getenv)
@@ -22,7 +26,11 @@ func main() {
 	ctx := context.Background()
 
 	// Initialize client (mock mode if keys are missing)
-	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, kioom.WithMockDomain())
+	var opts []kioom.Option
+	if *mockFlag {
+		opts = append(opts, kioom.WithMockDomain())
+	}
+	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, opts...)
 
 	// Note: In a real scenario, you need to set the Token after authentication.
 	// For this example, we assume the token is already set or the server is mocked.

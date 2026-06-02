@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -12,6 +13,9 @@ import (
 )
 
 func main() {
+	mockFlag := flag.Bool("mock", false, "Use mock domain")
+	flag.Parse()
+
 	cfg := kioomenv.Load(os.Getenv)
 	if err := cfg.RequireAppKeys(); err != nil {
 		log.Fatal(err)
@@ -20,7 +24,11 @@ func main() {
 	ctx := context.Background()
 
 	// Use mock domain for testing if needed
-	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, kioom.WithMockDomain())
+	var opts []kioom.Option
+	if *mockFlag {
+		opts = append(opts, kioom.WithMockDomain())
+	}
+	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, opts...)
 
 	// 2. Obtain an access token
 	tokenRes, err := client.IssueToken(ctx)

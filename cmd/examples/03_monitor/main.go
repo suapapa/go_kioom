@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -14,12 +15,19 @@ import (
 )
 
 func main() {
+	mockFlag := flag.Bool("mock", false, "Use mock domain")
+	flag.Parse()
+
 	cfg := kioomenv.Load(os.Getenv)
 	if err := cfg.RequireAppKeys(); err != nil {
 		log.Fatal(err)
 	}
 
-	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, kioom.WithMockDomain()) // 모의투자
+	var opts []kioom.Option
+	if *mockFlag {
+		opts = append(opts, kioom.WithMockDomain())
+	}
+	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, opts...) // 모의투자 여부 선택
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

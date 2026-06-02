@@ -38,7 +38,7 @@ func main() {
 	typeShort := flag.String("t", "", "차트 종류 (tick, min, day, week, month, year) (약칭)")
 	yamlFlag := flag.Bool("yaml", false, "YAML 형식으로 출력")
 	yamlShort := flag.Bool("y", false, "YAML 형식으로 출력 (약칭)")
-	mockFlag := flag.Bool("mock", true, "모의투자 도메인 사용 여부")
+	mockFlag := flag.Bool("mock", false, "모의투자 도메인 사용 여부")
 	mockShort := flag.Bool("m", false, "모의투자 도메인 사용 여부 (약칭)")
 
 	flag.Usage = func() {
@@ -73,7 +73,7 @@ func main() {
 	}
 
 	yamlOut = *yamlFlag || *yamlShort
-	useMock := *mockFlag && *mockShort
+	useMock := *mockFlag || *mockShort
 
 	chartType = strings.ToLower(chartType)
 	switch chartType {
