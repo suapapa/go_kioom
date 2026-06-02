@@ -93,6 +93,42 @@ kioom-mcp -transport sse -listen 127.0.0.1:8765 -sse-path /
 kioom-mcp -transport sse -listen 127.0.0.1:8765 -sse-path / -sse-token "my-secret-token"
 ```
 
+### Docker를 사용한 SSE 구동
+
+제공되는 Dockerfile을 사용하여 `kioom-mcp`를 컨테이너 환경에서 빌드하고 구동할 수 있습니다. 
+
+#### 1. 컨테이너 이미지 빌드
+컨테이너 빌드는 프로젝트 **루트 디렉터리**에서 실행해야 합니다.
+```bash
+docker build -t kioom-mcp-sse -f cmd/kioom-mcp/Dockerfile .
+```
+
+#### 2. 컨테이너 실행
+자격 증명 환경 변수를 넘겨서 로컬에서 빌드한 이미지를 실행합니다.
+```bash
+docker run -d \
+  -p 8765:8765 \
+  -e KIOOM_APP_KEY="your-app-key" \
+  -e KIOOM_SECRET_KEY="your-secret-key" \
+  -e KIOOM_MOCK="true" \
+  -e KIOOM_MCP_SSE_TOKEN="my-secret-token" \
+  --name kioom-mcp-container \
+  kioom-mcp-sse
+```
+
+#### 3. GitHub Container Registry (GHCR) 이미지 사용
+GitHub Actions를 통해 자동으로 빌드 및 배포되는 멀티 아키텍처(`amd64`, `arm64`) 공식 이미지를 직접 풀(pull)받아 실행할 수도 있습니다.
+```bash
+docker run -d \
+  -p 8765:8765 \
+  -e KIOOM_APP_KEY="your-app-key" \
+  -e KIOOM_SECRET_KEY="your-secret-key" \
+  -e KIOOM_MOCK="true" \
+  -e KIOOM_MCP_SSE_TOKEN="my-secret-token" \
+  --name kioom-mcp-container \
+  ghcr.io/suapapa/go_kioom/kioom-mcp:latest
+```
+
 인증 토큰이 설정된 경우, 클라이언트는 다음과 같이 인증하여 접근해야 합니다:
 
 1. **HTTP Header (추천)**:

@@ -1,6 +1,6 @@
 module github.com/suapapa/go_kioom
 
-go 1.25.5
+go 1.26.3
 
 require (
 	github.com/modelcontextprotocol/go-sdk v1.6.0
