@@ -148,3 +148,52 @@ func parseFloat(s string) float64 {
 	}
 	return val
 }
+
+// VolumeSurgeRequest represents the request payload for ka10023.
+type VolumeSurgeRequest struct {
+	MrktTp    string `json:"mrkt_tp"`      // 000:전체, 001:코스피, 101:코스닥
+	SortTp    string `json:"sort_tp"`      // 1:급증량, 2:급증률, 3:급감량, 4:급감률
+	TmTp      string `json:"tm_tp"`        // 1:분, 2:전일
+	TrdeQtyTp string `json:"trde_qty_tp"`  // 5:5천주이상, 10:만주이상, 50:5만주이상, 100:10만주이상, 200:20만주이상, 300:30만주이상, 500:50만주이상, 1000:백만주이상
+	Tm        string `json:"tm"`           // 분 입력
+	StkCnd    string `json:"stk_cnd"`      // 0:전체조회, 1:관리종목제외, 3:우선주제외, 11:정리매매종목제외...
+	PricTp    string `json:"pric_tp"`      // 0:전체조회, 2:5만원이상, 5:1만원이상, 6:5천원이상, 8:1천원이상, 9:10만원이상
+	StexTp    string `json:"stex_tp"`      // 1:KRX, 2:NXT, 3:통합
+}
+
+// VolumeSurgeItem represents a single item in the volume surge list.
+type VolumeSurgeItem struct {
+	StkCd       string `json:"stk_cd"`        // 종목코드
+	StkNm       string `json:"stk_nm"`        // 종목명
+	CurPrc      string `json:"cur_prc"`       // 현재가
+	PredPreSig  string `json:"pred_pre_sig"`  // 전일대비기호
+	PredPre     string `json:"pred_pre"`      // 전일대비
+	FluRt       string `json:"flu_rt"`        // 등락률
+	PrevTrdeQty string `json:"prev_trde_qty"` // 이전거래량
+	NowTrdeQty  string `json:"now_trde_qty"`  // 현재거래량
+	SdninQty    string `json:"sdnin_qty"`     // 급증량
+	SdninRt     string `json:"sdnin_rt"`      // 급증률
+}
+
+// VolumeSurgeResponse represents the response containing volume surge list.
+type VolumeSurgeResponse struct {
+	TrdeQtySdnin []VolumeSurgeItem `json:"trde_qty_sdnin"`
+	ReturnCode   int               `json:"return_code"`
+	ReturnMsg    string            `json:"return_msg"`
+}
+
+// GetVolumeSurge queries stocks with sudden volume surge or drop (ka10023).
+func (c *Client) GetVolumeSurge(ctx context.Context, reqBody *VolumeSurgeRequest) (*VolumeSurgeResponse, error) {
+	req, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/rkinfo", API_GetVolumeSurge, reqBody)
+	if err != nil {
+		return nil, err
+	}
+
+	var res VolumeSurgeResponse
+	if err := c.do(req, &res); err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+

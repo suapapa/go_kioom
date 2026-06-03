@@ -124,6 +124,17 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 	})
 
 	mcp.AddTool(s, &mcp.Tool{
+		Name:        "stock_volume_surge",
+		Description: "Query stock trading volume surge or drop; body matches kioom.VolumeSurgeRequest.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in kioom.VolumeSurgeRequest) (*mcp.CallToolResult, *kioom.VolumeSurgeResponse, error) {
+		if err := kioomvalidate.ValidateVolumeSurgeRequest(&in); err != nil {
+			return nil, nil, err
+		}
+		res, err := c.GetVolumeSurge(ctx, &in)
+		return nil, res, err
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
 		Name:        "stock_tick_chart",
 		Description: "Tick chart; body matches kioom.StockTickChartRequest.",
 	}, func(ctx context.Context, req *mcp.CallToolRequest, in kioom.StockTickChartRequest) (*mcp.CallToolResult, *kioom.StockTickChartResponse, error) {

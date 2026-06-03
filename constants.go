@@ -22,6 +22,7 @@ const (
 	API_GetStockBasicInfo    = "ka10001"
 	API_GetStockInstitutions = "ka10009"
 	API_GetRealtimeRank      = "ka00198"
+	API_GetVolumeSurge       = "ka10023"
 	API_GetTickChart         = "ka10079"
 	API_GetMinuteChart       = "ka10080"
 	API_GetDailyChart        = "ka10081"

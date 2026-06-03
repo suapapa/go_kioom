@@ -41,6 +41,7 @@ var catalog = map[string]map[string]commandFunc{
 		"basic":         cmdStockBasic,
 		"indicators":    cmdStockIndicators,
 		"rank":          cmdStockRank,
+		"volume-surge":  cmdStockVolumeSurge,
 		"tick-chart":    cmdStockTickChart,
 		"minute-chart":  cmdStockMinuteChart,
 		"daily-chart":   cmdStockDailyChart,
@@ -253,6 +254,21 @@ func cmdStockRank(c *kioom.Client, output string, args []string, w io.Writer) er
 		return err
 	}
 	res, err := c.GetRealtimeStockRank(context.Background(), req.QryTp)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdStockVolumeSurge(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.VolumeSurgeRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateVolumeSurgeRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.GetVolumeSurge(context.Background(), &req)
 	if err != nil {
 		return err
 	}

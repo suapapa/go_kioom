@@ -153,3 +153,39 @@ func ValidateOrderCancelRequest(req *kioom.OrderCancelRequest) error {
 		return fmt.Errorf("invalid dmst_stex_tp %q: expected one of [KRX,NXT,SOR]", req.DmstStexTp)
 	}
 }
+
+// ValidateVolumeSurgeRequest validates volume surge request parameters.
+func ValidateVolumeSurgeRequest(req *kioom.VolumeSurgeRequest) error {
+	switch req.MrktTp {
+	case "000", "001", "101":
+	default:
+		return fmt.Errorf("invalid mrkt_tp %q: expected one of [000, 001, 101]", req.MrktTp)
+	}
+
+	switch req.SortTp {
+	case "1", "2", "3", "4":
+	default:
+		return fmt.Errorf("invalid sort_tp %q: expected one of [1, 2, 3, 4]", req.SortTp)
+	}
+
+	switch req.TmTp {
+	case "1", "2":
+	default:
+		return fmt.Errorf("invalid tm_tp %q: expected one of [1, 2]", req.TmTp)
+	}
+
+	switch req.TrdeQtyTp {
+	case "5", "10", "50", "100", "200", "300", "500", "1000":
+	default:
+		return fmt.Errorf("invalid trde_qty_tp %q: expected one of [5, 10, 50, 100, 200, 300, 500, 1000]", req.TrdeQtyTp)
+	}
+
+	switch req.StexTp {
+	case "1", "2", "3":
+	default:
+		return fmt.Errorf("invalid stex_tp %q: expected one of [1, 2, 3]", req.StexTp)
+	}
+
+	return nil
+}
+
