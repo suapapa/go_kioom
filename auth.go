@@ -39,6 +39,18 @@ type RevokeResponse struct {
 // It automatically saves the issued token to the Client instance.
 // See Kiwoom API ID: au10001
 func (c *Client) IssueToken(ctx context.Context) (*TokenResponse, error) {
+	c.tokenMu.Lock()
+	defer c.tokenMu.Unlock()
+
+	// Double-check if the token was already refreshed by another concurrent request.
+	if currentToken := c.Token(); currentToken != "" {
+		return &TokenResponse{
+			Token:      currentToken,
+			ReturnCode: 0,
+			ReturnMsg:  "success (cached)",
+		}, nil
+	}
+
 	reqBody := TokenRequest{
 		GrantType: "client_credentials",
 		AppKey:    c.appKey,

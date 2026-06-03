@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -20,8 +21,11 @@ type Client struct {
 	secretKey  string
 	httpClient *http.Client
 
-	mu    sync.RWMutex
-	token string
+	mu      sync.RWMutex
+	token   string
+	tokenMu sync.Mutex
+
+	autoToken bool
 }
 
 // Option is a functional option for configuring the Client.
@@ -38,6 +42,13 @@ func WithHTTPClient(httpClient *http.Client) Option {
 func WithMockDomain() Option {
 	return func(c *Client) {
 		c.baseURL = MockDomain
+	}
+}
+
+// WithAutoToken enables automatic token issuance and renewal.
+func WithAutoToken() Option {
+	return func(c *Client) {
+		c.autoToken = true
 	}
 }
 
@@ -80,15 +91,25 @@ func (c *Client) BaseURL() string {
 
 // newRequest constructs a generic http.Request with required headers for Kiwoom API.
 func (c *Client) newRequest(ctx context.Context, method, path, apiID string, body interface{}) (*http.Request, error) {
-	var buf io.ReadWriter
-	if body != nil {
-		buf = new(bytes.Buffer)
-		if err := json.NewEncoder(buf).Encode(body); err != nil {
-			return nil, fmt.Errorf("encode body: %w", err)
+	// Avoid recursion/loop when calling token issue or revoke endpoints
+	if c.autoToken && path != "/oauth2/token" && path != "/oauth2/revoke" {
+		if c.Token() == "" {
+			if _, err := c.IssueToken(ctx); err != nil {
+				return nil, fmt.Errorf("auto-issue token: %w", err)
+			}
 		}
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+path, buf)
+	var bodyReader io.Reader
+	if body != nil {
+		var buf bytes.Buffer
+		if err := json.NewEncoder(&buf).Encode(body); err != nil {
+			return nil, fmt.Errorf("encode body: %w", err)
+		}
+		bodyReader = bytes.NewReader(buf.Bytes())
+	}
+
+	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+path, bodyReader)
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
@@ -113,6 +134,51 @@ func (c *Client) do(req *http.Request, v interface{}) error {
 		return fmt.Errorf("do request: %w", err)
 	}
 	defer resp.Body.Close()
+
+	if c.autoToken && resp.StatusCode == http.StatusUnauthorized && req.URL.Path != "/oauth2/token" && req.URL.Path != "/oauth2/revoke" {
+		oldToken := req.Header.Get("authorization")
+		if strings.HasPrefix(oldToken, "Bearer ") {
+			oldToken = oldToken[7:]
+		}
+
+		c.mu.Lock()
+		if c.token == oldToken {
+			c.token = ""
+		}
+		c.mu.Unlock()
+
+		_, err := c.IssueToken(req.Context())
+		if err != nil {
+			return fmt.Errorf("auto-refresh token failed: %w", err)
+		}
+
+		req.Header.Set("authorization", "Bearer "+c.Token())
+
+		if req.GetBody != nil {
+			body, err := req.GetBody()
+			if err != nil {
+				return fmt.Errorf("get body for retry: %w", err)
+			}
+			req.Body = body
+		}
+
+		resp2, err := c.httpClient.Do(req)
+		if err != nil {
+			return fmt.Errorf("retry request: %w", err)
+		}
+		defer resp2.Body.Close()
+
+		if resp2.StatusCode < 200 || resp2.StatusCode >= 300 {
+			return fmt.Errorf("API request failed with status: %s (retry)", resp2.Status)
+		}
+
+		if v != nil {
+			if err := json.NewDecoder(resp2.Body).Decode(v); err != nil {
+				return fmt.Errorf("decode response (retry): %w", err)
+			}
+		}
+		return nil
+	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return fmt.Errorf("API request failed with status: %s", resp.Status)

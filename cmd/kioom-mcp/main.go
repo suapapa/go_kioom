@@ -51,6 +51,7 @@ func main() {
 	if cfg.Mock {
 		opts = append(opts, kioom.WithMockDomain())
 	}
+	opts = append(opts, kioom.WithAutoToken())
 	client := kioom.NewClient(cfg.AppKey, cfg.SecretKey, opts...)
 	if cfg.Token != "" {
 		client.SetToken(cfg.Token)

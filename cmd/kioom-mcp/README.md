@@ -53,7 +53,7 @@ SIGINT/SIGTERM으로 종료하면 **SSE 모드**에서는 `http.Server.Shutdown`
 ```bash
 export KIOOM_APP_KEY="..."
 export KIOOM_SECRET_KEY="..."
-# 선택: export KIOOM_TOKEN="..." 
+# 선택: export KIOOM_TOKEN="..." (KIOOM_TOKEN을 설정하지 않아도 KIOOM_APP_KEY, KIOOM_SECRET_KEY를 통해 자동으로 토큰을 발급 및 갱신합니다.)
 # 선택: export KIOOM_MOCK=true
 
 kioom-mcp
