@@ -67,6 +67,49 @@ func main() {
 			log.Fatal(err)
 		}
 	case "sse":
+		srv.AddReceivingMiddleware(func(next mcp.MethodHandler) mcp.MethodHandler {
+			return func(ctx context.Context, method string, req mcp.Request) (mcp.Result, error) {
+				sessionID := ""
+				if sess := req.GetSession(); sess != nil {
+					sessionID = sess.ID()
+				}
+
+				var toolName string
+				if method == "tools/call" {
+					if rawParams, ok := req.GetParams().(*mcp.CallToolParamsRaw); ok {
+						toolName = rawParams.Name
+					}
+				}
+
+				if toolName != "" {
+					log.Printf("MCP Request: tool=%s session=%s", toolName, sessionID)
+				} else {
+					log.Printf("MCP Request: method=%s session=%s", method, sessionID)
+				}
+
+				res, err := next(ctx, method, req)
+				if err != nil {
+					if toolName != "" {
+						log.Printf("MCP Response: tool=%s session=%s status=failed err=%v", toolName, sessionID, err)
+					} else {
+						log.Printf("MCP Response: method=%s session=%s status=failed err=%v", method, sessionID, err)
+					}
+				} else {
+					status := "success"
+					if res != nil {
+						if toolRes, ok := res.(*mcp.CallToolResult); ok && toolRes.IsError {
+							status = "tool_error"
+						}
+					}
+					if toolName != "" {
+						log.Printf("MCP Response: tool=%s session=%s status=%s", toolName, sessionID, status)
+					} else {
+						log.Printf("MCP Response: method=%s session=%s status=%s", method, sessionID, status)
+					}
+				}
+				return res, err
+			}
+		})
 		if err := runSSE(srv, *listen, normalizeSSEPath(*ssePath), *sseToken); err != nil {
 			log.Fatal(err)
 		}
@@ -95,7 +138,7 @@ func runSSE(mcpsrv *mcp.Server, listenAddr, path, token string) error {
 	addr := strings.TrimSpace(listenAddr)
 	httpSrv := &http.Server{
 		Addr:              addr,
-		Handler:           mux,
+		Handler:           loggingMiddleware(mux),
 		ReadHeaderTimeout: 3 * time.Second,
 		ReadTimeout:       15 * time.Second,
 		WriteTimeout:      15 * time.Second,
@@ -192,4 +235,42 @@ func normalizeSSEPath(p string) string {
 		p += "/"
 	}
 	return p
+}
+
+type loggingResponseWriter struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func (lrw *loggingResponseWriter) WriteHeader(code int) {
+	lrw.statusCode = code
+	lrw.ResponseWriter.WriteHeader(code)
+}
+
+func (lrw *loggingResponseWriter) Flush() {
+	if fl, ok := lrw.ResponseWriter.(http.Flusher); ok {
+		fl.Flush()
+	}
+}
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		isSSE := r.Method == "GET" && strings.Contains(r.Header.Get("Accept"), "text/event-stream")
+
+		if isSSE {
+			log.Printf("SSE client connection attempt from %s (URI: %s)", r.RemoteAddr, r.RequestURI)
+		} else {
+			log.Printf("HTTP Request: %s %s from %s", r.Method, r.URL.Path, r.RemoteAddr)
+		}
+
+		lrw := &loggingResponseWriter{ResponseWriter: w, statusCode: http.StatusOK}
+		next.ServeHTTP(lrw, r)
+
+		if isSSE {
+			log.Printf("SSE client connection closed / finished from %s (URI: %s, active for %v)", r.RemoteAddr, r.RequestURI, time.Since(start))
+		} else {
+			log.Printf("HTTP Response: status %d for %s %s from %s (took %v)", lrw.statusCode, r.Method, r.URL.Path, r.RemoteAddr, time.Since(start))
+		}
+	})
 }

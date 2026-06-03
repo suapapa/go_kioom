@@ -93,3 +93,40 @@ func TestAuthMiddleware(t *testing.T) {
 		})
 	}
 }
+
+func TestLoggingMiddleware(t *testing.T) {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusAccepted)
+		_, _ = w.Write([]byte("Accepted"))
+	})
+
+	logged := loggingMiddleware(handler)
+
+	req := httptest.NewRequest("GET", "http://example.com/", nil)
+	rec := httptest.NewRecorder()
+	logged.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusAccepted {
+		t.Errorf("expected status %d, got %d", http.StatusAccepted, rec.Code)
+	}
+}
+
+type mockFlusherResponseWriter struct {
+	*httptest.ResponseRecorder
+	flushed bool
+}
+
+func (m *mockFlusherResponseWriter) Flush() {
+	m.flushed = true
+}
+
+func TestLoggingResponseWriterFlush(t *testing.T) {
+	rec := httptest.NewRecorder()
+	w := &mockFlusherResponseWriter{ResponseRecorder: rec}
+	lrw := &loggingResponseWriter{ResponseWriter: w}
+	lrw.Flush()
+
+	if !w.flushed {
+		t.Error("expected Flush to be called on underlying ResponseWriter")
+	}
+}
