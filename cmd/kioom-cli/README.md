@@ -98,7 +98,7 @@ Supported sections/actions:
 
 - `auth issue|revoke`
 - `account number|deposit|balance`
-- `stock basic|rank|minute-chart`
+- `stock basic|indicators|rank|volume-surge|tick-chart|minute-chart|daily-chart|weekly-chart|monthly-chart|yearly-chart`
 - `order buy|sell|modify|cancel`
 
 ## Schema Introspection (Strongly Recommended for Agents)

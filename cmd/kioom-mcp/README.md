@@ -175,8 +175,15 @@ docker run -d \
 | `account_deposit` | 예수금 등 (`kioom.DepositRequest` JSON) |
 | `account_balance` | 잔고 조회 (`kioom.AccountBalanceRequest`) |
 | `stock_basic` | 종목 기본 정보 (`stk_cd` 등) |
+| `stock_indicators` | 주식 지표 조회 (ROE, PER, EPS 등) |
 | `stock_rank` | 실시간 조회 순위 (`kioom.RealtimeItemRankRequest`) |
-| `stock_minute_chart` | 분봉 (`kioom.StockMinuteChartRequest`) |
+| `stock_volume_surge` | 거래량 급증/급감 조회 (`kioom.VolumeSurgeRequest`) |
+| `stock_tick_chart` | 틱 차트 조회 (`kioom.StockTickChartRequest`) |
+| `stock_minute_chart` | 분봉 차트 조회 (`kioom.StockMinuteChartRequest`) |
+| `stock_daily_chart` | 일봉 차트 조회 (`kioom.StockChartRequest`) |
+| `stock_weekly_chart` | 주봉 차트 조회 (`kioom.StockChartRequest`) |
+| `stock_monthly_chart` | 월봉 차트 조회 (`kioom.StockChartRequest`) |
+| `stock_yearly_chart` | 년봉 차트 조회 (`kioom.StockChartRequest`) |
 | `order_buy` / `order_sell` | 매수·매도 주문 |
 | `order_modify` / `order_cancel` | 정정·취소 |
 

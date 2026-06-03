@@ -84,3 +84,42 @@ func TestParseFloat(t *testing.T) {
 		}
 	}
 }
+
+func TestGetVolumeSurge(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		res := VolumeSurgeResponse{
+			ReturnCode: 0,
+			TrdeQtySdnin: []VolumeSurgeItem{
+				{StkCd: "005930", StkNm: "Samsung"},
+			},
+		}
+		json.NewEncoder(w).Encode(res)
+	}))
+	defer server.Close()
+
+	client := NewClient("app", "sec", WithMockDomain())
+	client.baseURL = server.URL
+
+	req := &VolumeSurgeRequest{
+		MrktTp:    "000",
+		SortTp:    "1",
+		TmTp:      "2",
+		TrdeQtyTp: "5",
+		Tm:        "",
+		StkCnd:    "0",
+		PricTp:    "0",
+		StexTp:    "3",
+	}
+	res, err := client.GetVolumeSurge(context.Background(), req)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if len(res.TrdeQtySdnin) != 1 {
+		t.Fatalf("expected 1 item, got %d", len(res.TrdeQtySdnin))
+	}
+	if res.TrdeQtySdnin[0].StkCd != "005930" {
+		t.Errorf("expected StkCd 005930, got %s", res.TrdeQtySdnin[0].StkCd)
+	}
+}
+

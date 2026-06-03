@@ -63,7 +63,7 @@ This document tracks the implementation progress of the Kiwoom REST API wrapper 
 - [ ] `ka10020` - 호가잔량상위요청
 - [ ] `ka10021` - 호가잔량급증요청
 - [ ] `ka10022` - 잔량율급증요청
-- [ ] `ka10023` - 거래량급증요청
+- [x] `ka10023` - [거래량급증요청](./stock.go#L185)
 - [ ] `ka10024` - 거래량갱신요청
 - [ ] `ka10025` - 매물대집중요청
 - [ ] `ka10026` - 고저PER요청

@@ -85,9 +85,21 @@ func TestParseGlobal(t *testing.T) {
 func TestRunSchema(t *testing.T) {
 	t.Parallel()
 
-	cases := []string{"stock.basic", "stock.tick-chart", "stock.daily-chart", "stock.weekly-chart", "stock.monthly-chart", "stock.yearly-chart"}
-	for _, tc := range cases {
+	cases := map[string]string{
+		"stock.basic":         "stk_cd",
+		"stock.indicators":    "stk_cd",
+		"stock.rank":          "qry_tp",
+		"stock.volume-surge":  "mrkt_tp",
+		"stock.tick-chart":    "stk_cd",
+		"stock.minute-chart":  "stk_cd",
+		"stock.daily-chart":   "stk_cd",
+		"stock.weekly-chart":  "stk_cd",
+		"stock.monthly-chart": "stk_cd",
+		"stock.yearly-chart":  "stk_cd",
+	}
+	for tc, field := range cases {
 		tc := tc
+		field := field
 		t.Run(tc, func(t *testing.T) {
 			out := new(bytes.Buffer)
 			errOut := new(bytes.Buffer)
@@ -104,8 +116,8 @@ func TestRunSchema(t *testing.T) {
 			if !strings.Contains(body, `"command":"`+tc+`"`) {
 				t.Fatalf("expected command path in body, got %s", body)
 			}
-			if !strings.Contains(body, `"stk_cd"`) {
-				t.Fatalf("expected stock schema field in body, got %s", body)
+			if !strings.Contains(body, `"`+field+`"`) {
+				t.Fatalf("expected schema field %q in body, got %s", field, body)
 			}
 		})
 	}
