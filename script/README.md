@@ -108,6 +108,7 @@ python3 script/plot_chart.py script/samsung_chart_day.yaml --days 60 -o script/s
 
 ## ⚙️ CLI 옵션 상세 (CLI Options)
 
+### 1. `plot_chart.py`
 ```
 사용법:
   python3 script/plot_chart.py [yaml_file] [--days DAYS] [-o OUTPUT]
@@ -123,10 +124,40 @@ python3 script/plot_chart.py script/samsung_chart_day.yaml --days 60 -o script/s
                         차트를 대화형 화면에 띄우는 대신, 지정한 이미지 경로로 저장합니다 (예: -o output.png).
 ```
 
+### 2. `search_ticker.py`
+```
+사용법:
+  python3 script/search_ticker.py query [-q]
+
+위치 인자 (Positional Arguments):
+  query                 검색할 종목명 또는 종목명 일부 (대소문자 구분 없음).
+
+선택 인자 (Optional Arguments):
+  -h, --help            도움말 메시지를 출력하고 종료합니다.
+  -q, --quiet           가장 일치하는 종목의 티커(종목코드)만 출력합니다 (셸 스크립트 연동에 유용).
+```
+
+---
+
+## 🔍 종목 코드로 티커 검색 예시 (`search_ticker.py`)
+
+주식 차트를 조회하려면 종목코드(티커)가 필요합니다. `search_ticker.py`를 사용해 종목 이름으로 신속하게 코드를 찾을 수 있습니다.
+
+* **인터랙티브 검색**:
+  ```bash
+  python3 script/search_ticker.py 삼성
+  ```
+* **티커 코드만 바로 추출 (스크립트 연동용)**:
+  ```bash
+  python3 script/search_ticker.py 삼성전자 -q
+  # 출력: 005930
+  ```
+
 ---
 
 ## 📂 파일 구조 참고
 
 * **`plot_chart.py`**: 차트를 생성하는 메인 Python 스크립트입니다.
+* **`search_ticker.py`**: 종목명으로 티커 코드를 검색하는 스크립트입니다.
 * **`*.yaml`**: Go 예제 실행을 통해 생성되는 주식 차트 로우 데이터(YAML) 백업입니다.
 * **`*.png`**: 스크립트의 시각화 결과를 내보낸 고해상도 캔들스틱 차트 예시 이미지들입니다.
