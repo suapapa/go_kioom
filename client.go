@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -71,17 +72,23 @@ func NewClient(appKey, secretKey string, opts ...Option) *Client {
 }
 
 // SetToken sets the OAuth token manually.
+// Also updates the environment variable KIOOM_TOKEN.
 func (c *Client) SetToken(token string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.token = token
+	os.Setenv("KIOOM_TOKEN", token)
 }
 
 // Token returns the current access token.
+// Checks environment variable KIOOM_TOKEN if internal token is empty.
 func (c *Client) Token() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	return c.token
+	if c.token != "" {
+		return c.token
+	}
+	return os.Getenv("KIOOM_TOKEN")
 }
 
 // BaseURL returns the base URL of the client.

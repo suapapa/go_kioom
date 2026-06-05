@@ -140,8 +140,6 @@ func runSSE(mcpsrv *mcp.Server, listenAddr, path, token string) error {
 		Addr:              addr,
 		Handler:           loggingMiddleware(mux),
 		ReadHeaderTimeout: 3 * time.Second,
-		ReadTimeout:       15 * time.Second,
-		WriteTimeout:      15 * time.Second,
 		IdleTimeout:       30 * time.Second,
 	}
 
