@@ -34,7 +34,7 @@ func NewServer(client *kioom.Client, impl *mcp.Implementation, opts *mcp.ServerO
 }
 
 func serverInstructions() string {
-	return `Kiwoom Open API MCP server. Set KIOOM_APP_KEY and KIOOM_SECRET_KEY (and optionally KIOOM_TOKEN, KIOOM_MOCK=true) like kioom-cli. Tools mirror kioom-cli sections auth, account, stock, and order.`
+	return `Kiwoom Open API MCP server. Requires KIOOM_APP_KEY and KIOOM_SECRET_KEY environment variables (and optionally KIOOM_TOKEN, KIOOM_MOCK=true for testing). Provides tools for authentication (auth_*), account management (account_*), stock querying (stock_*), and trading/ordering (order_*).`
 }
 
 func addTools(s *mcp.Server, c *kioom.Client) {
