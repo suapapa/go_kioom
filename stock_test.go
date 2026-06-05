@@ -122,4 +122,3 @@ func TestGetVolumeSurge(t *testing.T) {
 		t.Errorf("expected StkCd 005930, got %s", res.TrdeQtySdnin[0].StkCd)
 	}
 }
-

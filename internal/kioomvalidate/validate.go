@@ -188,4 +188,3 @@ func ValidateVolumeSurgeRequest(req *kioom.VolumeSurgeRequest) error {
 
 	return nil
 }
-

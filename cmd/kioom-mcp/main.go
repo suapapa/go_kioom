@@ -59,6 +59,50 @@ func main() {
 
 	srv := mcpkioom.NewServer(client, nil, nil)
 
+	srv.AddReceivingMiddleware(func(next mcp.MethodHandler) mcp.MethodHandler {
+		return func(ctx context.Context, method string, req mcp.Request) (mcp.Result, error) {
+			sessionID := ""
+			if sess := req.GetSession(); sess != nil {
+				sessionID = sess.ID()
+			}
+
+			var toolName string
+			if method == "tools/call" {
+				if rawParams, ok := req.GetParams().(*mcp.CallToolParamsRaw); ok {
+					toolName = rawParams.Name
+				}
+			}
+
+			if toolName != "" {
+				log.Printf("MCP Request: tool=%s session=%s", toolName, sessionID)
+			} else {
+				log.Printf("MCP Request: method=%s session=%s", method, sessionID)
+			}
+
+			res, err := next(ctx, method, req)
+			if err != nil {
+				if toolName != "" {
+					log.Printf("MCP Response: tool=%s session=%s status=failed err=%v", toolName, sessionID, err)
+				} else {
+					log.Printf("MCP Response: method=%s session=%s status=failed err=%v", method, sessionID, err)
+				}
+			} else {
+				status := "success"
+				if res != nil {
+					if toolRes, ok := res.(*mcp.CallToolResult); ok && toolRes.IsError {
+						status = "tool_error"
+					}
+				}
+				if toolName != "" {
+					log.Printf("MCP Response: tool=%s session=%s status=%s", toolName, sessionID, status)
+				} else {
+					log.Printf("MCP Response: method=%s session=%s status=%s", method, sessionID, status)
+				}
+			}
+			return res, err
+		}
+	})
+
 	switch strings.ToLower(strings.TrimSpace(*transport)) {
 	case "stdio":
 		rootCtx := signalContext(context.Background())
@@ -67,49 +111,6 @@ func main() {
 			log.Fatal(err)
 		}
 	case "sse":
-		srv.AddReceivingMiddleware(func(next mcp.MethodHandler) mcp.MethodHandler {
-			return func(ctx context.Context, method string, req mcp.Request) (mcp.Result, error) {
-				sessionID := ""
-				if sess := req.GetSession(); sess != nil {
-					sessionID = sess.ID()
-				}
-
-				var toolName string
-				if method == "tools/call" {
-					if rawParams, ok := req.GetParams().(*mcp.CallToolParamsRaw); ok {
-						toolName = rawParams.Name
-					}
-				}
-
-				if toolName != "" {
-					log.Printf("MCP Request: tool=%s session=%s", toolName, sessionID)
-				} else {
-					log.Printf("MCP Request: method=%s session=%s", method, sessionID)
-				}
-
-				res, err := next(ctx, method, req)
-				if err != nil {
-					if toolName != "" {
-						log.Printf("MCP Response: tool=%s session=%s status=failed err=%v", toolName, sessionID, err)
-					} else {
-						log.Printf("MCP Response: method=%s session=%s status=failed err=%v", method, sessionID, err)
-					}
-				} else {
-					status := "success"
-					if res != nil {
-						if toolRes, ok := res.(*mcp.CallToolResult); ok && toolRes.IsError {
-							status = "tool_error"
-						}
-					}
-					if toolName != "" {
-						log.Printf("MCP Response: tool=%s session=%s status=%s", toolName, sessionID, status)
-					} else {
-						log.Printf("MCP Response: method=%s session=%s status=%s", method, sessionID, status)
-					}
-				}
-				return res, err
-			}
-		})
 		if err := runSSE(srv, *listen, normalizeSSEPath(*ssePath), *sseToken); err != nil {
 			log.Fatal(err)
 		}
