@@ -10,7 +10,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strings"
 	"sync"
 	"time"
 )
@@ -110,7 +109,6 @@ func (c *Client) newRequest(ctx context.Context, method, path, apiID string, bod
 		}
 		bodyReader = bytes.NewReader(buf.Bytes())
 	}
-
 	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+path, bodyReader)
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
@@ -138,18 +136,7 @@ func (c *Client) do(req *http.Request, v interface{}) error {
 	defer resp.Body.Close()
 
 	if c.autoToken && resp.StatusCode == http.StatusUnauthorized && req.URL.Path != "/oauth2/token" && req.URL.Path != "/oauth2/revoke" {
-		oldToken := req.Header.Get("authorization")
-		if strings.HasPrefix(oldToken, "Bearer ") {
-			oldToken = oldToken[7:]
-		}
-
-		c.mu.Lock()
-		if c.token == oldToken {
-			c.token = ""
-		}
-		c.mu.Unlock()
-
-		_, err := c.IssueToken(req.Context())
+		_, err := c.IssueTokenForce(req.Context())
 		if err != nil {
 			return fmt.Errorf("auto-refresh token failed: %w", err)
 		}

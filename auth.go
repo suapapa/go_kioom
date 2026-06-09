@@ -76,6 +76,14 @@ func (c *Client) IssueToken(ctx context.Context) (*TokenResponse, error) {
 	return &res, nil
 }
 
+// IssueTokenForce forcibly issues a new token even if a cached one exists.
+func (c *Client) IssueTokenForce(ctx context.Context) (*TokenResponse, error) {
+	c.mu.Lock()
+	c.token = ""
+	c.mu.Unlock()
+	return c.IssueToken(ctx)
+}
+
 // RevokeToken revokes the currently issued access token.
 // After successfully revoking the token, the Client's internal Token field is cleared.
 // See Kiwoom API ID: au10002
