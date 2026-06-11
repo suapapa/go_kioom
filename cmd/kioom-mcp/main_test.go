@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -95,12 +96,17 @@ func TestAuthMiddleware(t *testing.T) {
 }
 
 func TestLoggingMiddleware(t *testing.T) {
+	logger, err := setupLogger("text", io.Discard)
+	if err != nil {
+		t.Fatalf("setupLogger() error = %v", err)
+	}
+
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusAccepted)
 		_, _ = w.Write([]byte("Accepted"))
 	})
 
-	logged := loggingMiddleware(handler)
+	logged := loggingMiddleware(logger, handler)
 
 	req := httptest.NewRequest("GET", "http://example.com/", nil)
 	rec := httptest.NewRecorder()

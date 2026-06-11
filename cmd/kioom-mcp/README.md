@@ -43,6 +43,7 @@ go build -o bin/kioom-mcp ./cmd/kioom-mcp
 | `-listen` | `127.0.0.1:8765` | `-transport=sse`일 때 `host:port` |
 | `-sse-path` | `/` | SSE 핸들러를 붙일 URL 경로. 루트가 아니면 내부에서 끝에 `/`가 붙을 수 있음(Go 1.22+ `ServeMux` 서브트리 매칭) |
 | `-sse-token` | (환경변수값) | SSE 클라이언트 인증용 Bearer 토큰. 설정 시 클라이언트는 HTTP Header (`Authorization: Bearer <토큰>`) 또는 URL 쿼리 파라미터 (`?token=<토큰>` 또는 `?auth=<토큰>`)를 제공해야 합니다. |
+| `-log-format` | `text` | 로그 출력 형식: `text`(사람이 읽기 쉬운 형식) 또는 `json`(구조화 JSON) |
 
 SIGINT/SIGTERM으로 종료하면 **SSE 모드**에서는 `http.Server.Shutdown`으로 정리합니다(최대 10초).
 

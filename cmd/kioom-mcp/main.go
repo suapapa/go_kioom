@@ -12,7 +12,7 @@ import (
 	"context"
 	"crypto/subtle"
 	"flag"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -27,24 +27,29 @@ import (
 )
 
 func main() {
-	log.SetPrefix("kioom-mcp: ")
-	log.SetFlags(0)
-
-	// Load environment variables from .env if present
-	if err := kioomenv.LoadEnvFile(".env"); err != nil {
-		log.Printf("warning: failed to load .env file: %v", err)
-	}
-
 	transport := flag.String("transport", "stdio", "Transport: stdio or sse")
 	listen := flag.String("listen", "127.0.0.1:8765", "Listen address for -transport=sse")
 	ssePath := flag.String("sse-path", "/", "HTTP path prefix for -transport=sse (non-root paths get a trailing / for POST session routing)")
 	sseToken := flag.String("sse-token", os.Getenv("KIOOM_MCP_SSE_TOKEN"), "Bearer token to authenticate incoming SSE client connections")
+	logFormat := flag.String("log-format", "text", "Log output format: text (human-readable) or json")
 
 	flag.Parse()
 
+	logger, err := setupLogger(*logFormat, os.Stderr)
+	if err != nil {
+		slog.Error("invalid logging configuration", "error", err)
+		os.Exit(1)
+	}
+	slog.SetDefault(logger)
+
+	// Load environment variables from .env if present
+	if err := kioomenv.LoadEnvFile(".env"); err != nil {
+		logger.Warn("failed to load .env file", "error", err)
+	}
+
 	cfg, err := loadConfig()
 	if err != nil {
-		log.Fatal(err)
+		fatal(logger, "configuration error", "error", err)
 	}
 
 	var opts []kioom.Option
@@ -59,11 +64,14 @@ func main() {
 
 	srv := mcpkioom.NewServer(client, nil, nil)
 
+	sessionIDs := &sessionLogRegistry{}
+
 	srv.AddReceivingMiddleware(func(next mcp.MethodHandler) mcp.MethodHandler {
 		return func(ctx context.Context, method string, req mcp.Request) (mcp.Result, error) {
-			sessionID := ""
-			if sess := req.GetSession(); sess != nil {
-				sessionID = sess.ID()
+			sess := req.GetSession()
+			sessionID := sessionIDs.resolve(sess)
+			if method == "initialize" && sessionID != "" {
+				logger.Info("MCP session started", "session", sessionID)
 			}
 
 			var toolName string
@@ -74,17 +82,17 @@ func main() {
 			}
 
 			if toolName != "" {
-				log.Printf("MCP Request: tool=%s session=%s", toolName, sessionID)
+				logger.Info("MCP request", "tool", toolName, "session", sessionID)
 			} else {
-				log.Printf("MCP Request: method=%s session=%s", method, sessionID)
+				logger.Info("MCP request", "method", method, "session", sessionID)
 			}
 
 			res, err := next(ctx, method, req)
 			if err != nil {
 				if toolName != "" {
-					log.Printf("MCP Response: tool=%s session=%s status=failed err=%v", toolName, sessionID, err)
+					logger.Error("MCP response failed", "tool", toolName, "session", sessionID, "error", err)
 				} else {
-					log.Printf("MCP Response: method=%s session=%s status=failed err=%v", method, sessionID, err)
+					logger.Error("MCP response failed", "method", method, "session", sessionID, "error", err)
 				}
 			} else {
 				status := "success"
@@ -94,9 +102,9 @@ func main() {
 					}
 				}
 				if toolName != "" {
-					log.Printf("MCP Response: tool=%s session=%s status=%s", toolName, sessionID, status)
+					logger.Info("MCP response", "tool", toolName, "session", sessionID, "status", status)
 				} else {
-					log.Printf("MCP Response: method=%s session=%s status=%s", method, sessionID, status)
+					logger.Info("MCP response", "method", method, "session", sessionID, "status", status)
 				}
 			}
 			return res, err
@@ -108,14 +116,14 @@ func main() {
 		rootCtx := signalContext(context.Background())
 		defer rootCtx.stop()
 		if err := srv.Run(rootCtx.ctx, &mcp.StdioTransport{}); err != nil {
-			log.Fatal(err)
+			fatal(logger, "stdio transport stopped", "error", err)
 		}
 	case "sse":
-		if err := runSSE(srv, *listen, normalizeSSEPath(*ssePath), *sseToken); err != nil {
-			log.Fatal(err)
+		if err := runSSE(logger, srv, *listen, normalizeSSEPath(*ssePath), *sseToken); err != nil {
+			fatal(logger, "sse transport stopped", "error", err)
 		}
 	default:
-		log.Fatalf("unknown -transport %q: use stdio or sse", *transport)
+		fatal(logger, "unknown transport", "transport", *transport)
 	}
 }
 
@@ -127,7 +135,7 @@ func loadConfig() (kioomenv.Config, error) {
 	return c, nil
 }
 
-func runSSE(mcpsrv *mcp.Server, listenAddr, path, token string) error {
+func runSSE(logger *slog.Logger, mcpsrv *mcp.Server, listenAddr, path, token string) error {
 	h := mcp.NewSSEHandler(func(_ *http.Request) *mcp.Server { return mcpsrv }, nil)
 	mux := http.NewServeMux()
 	if token != "" {
@@ -139,7 +147,7 @@ func runSSE(mcpsrv *mcp.Server, listenAddr, path, token string) error {
 	addr := strings.TrimSpace(listenAddr)
 	httpSrv := &http.Server{
 		Addr:              addr,
-		Handler:           loggingMiddleware(mux),
+		Handler:           loggingMiddleware(logger, mux),
 		ReadHeaderTimeout: 3 * time.Second,
 		IdleTimeout:       30 * time.Second,
 	}
@@ -149,7 +157,7 @@ func runSSE(mcpsrv *mcp.Server, listenAddr, path, token string) error {
 
 	errCh := make(chan error, 1)
 	go func() {
-		log.Printf("listening on http://%s%s (SSE transport); shutdown with SIGINT/SIGTERM", addr, path)
+		logger.Info("listening", "addr", addr, "path", path, "transport", "sse")
 		errCh <- httpSrv.ListenAndServe()
 	}()
 
@@ -252,24 +260,25 @@ func (lrw *loggingResponseWriter) Flush() {
 	}
 }
 
-func loggingMiddleware(next http.Handler) http.Handler {
+func loggingMiddleware(logger *slog.Logger, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		isSSE := r.Method == "GET" && strings.Contains(r.Header.Get("Accept"), "text/event-stream")
 
 		if isSSE {
-			log.Printf("SSE client connection attempt from %s (URI: %s)", r.RemoteAddr, r.RequestURI)
+			logger.Info("SSE client connecting", "remote", r.RemoteAddr, "uri", r.RequestURI)
 		} else {
-			log.Printf("HTTP Request: %s %s from %s", r.Method, r.URL.Path, r.RemoteAddr)
+			logger.Info("HTTP request", "method", r.Method, "path", r.URL.Path, "remote", r.RemoteAddr)
 		}
 
 		lrw := &loggingResponseWriter{ResponseWriter: w, statusCode: http.StatusOK}
 		next.ServeHTTP(lrw, r)
 
+		duration := time.Since(start)
 		if isSSE {
-			log.Printf("SSE client connection closed / finished from %s (URI: %s, active for %v)", r.RemoteAddr, r.RequestURI, time.Since(start))
+			logger.Info("SSE client disconnected", "remote", r.RemoteAddr, "uri", r.RequestURI, "duration", duration)
 		} else {
-			log.Printf("HTTP Response: status %d for %s %s from %s (took %v)", lrw.statusCode, r.Method, r.URL.Path, r.RemoteAddr, time.Since(start))
+			logger.Info("HTTP response", "status", lrw.statusCode, "method", r.Method, "path", r.URL.Path, "remote", r.RemoteAddr, "duration", duration)
 		}
 	})
 }
