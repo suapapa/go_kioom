@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>go_kioom - 키움 증권 도구 모음</title>
+  <meta name="description" content="키움증권 REST API 명세에 맞춘 비공식 Golang 래퍼 패키지, CLI, MCP 서버.">
+  <link rel="stylesheet" href="index.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <div class="logo">go_kioom</div>
+      <nav aria-label="Main Navigation">
+        <a href="https://github.com/suapapa/go_kioom" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://pkg.go.dev/github.com/suapapa/go_kioom" target="_blank" rel="noopener">Docs</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>Go 언어로 작성한<br>키움 증권 도구 모음</h1>
+        <p class="subtitle">키움증권 REST API 명세에 맞춘 비공식 Golang 래퍼 패키지입니다. Go 클라이언트, CLI, MCP 서버가 한 저장소에 모여 있습니다.</p>
+        <div class="hero-actions">
+          <a href="#quick-start" class="btn btn-primary">시작하기</a>
+          <a href="https://github.com/suapapa/go_kioom" class="btn btn-secondary">GitHub 저장소</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="container">
+        <div class="feature-grid">
+          <article class="feature">
+            <h2>MCP (kioom-mcp)</h2>
+            <p>동일한 Client를 Model Context Protocol(MCP) 서버로 노출합니다. Cursor, Claude Desktop 같은 MCP 클라이언트는 stdio(기본)나 HTTP+SSE로 연결하면 키움 API를 다룰 수 있습니다.</p>
+            <a href="https://github.com/suapapa/go_kioom/blob/main/cmd/kioom-mcp/README.md" target="_blank" rel="noopener" class="feature-link">자세히 보기</a>
+          </article>
+          <article class="feature">
+            <h2>CLI (kioom-cli)</h2>
+            <p>JSON 입출력과 스키마 조회용 CLI입니다. 터미널에서 API를 테스트하거나 자동화 스크립트에 붙이기 좋습니다.</p>
+            <a href="https://github.com/suapapa/go_kioom/blob/main/cmd/kioom-cli/README.md" target="_blank" rel="noopener" class="feature-link">자세히 보기</a>
+          </article>
+          <article class="feature">
+            <h2>Go Package</h2>
+            <p>Go에서 바로 쓸 수 있는 클라이언트 패키지입니다. 토큰 발급·갱신, 에러 처리, 요청·응답 구조체가 정리돼 있어 백엔드에 붙이기 편합니다.</p>
+            <a href="https://pkg.go.dev/github.com/suapapa/go_kioom" target="_blank" rel="noopener" class="feature-link">패키지 문서</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="quick-start" class="code-section">
+      <div class="container">
+        <h2>사용 방법 (Go Package)</h2>
+        <p>클라이언트를 만들고 계좌 정보와 주식 시세를 조회하는 예제입니다.</p>
+        <div class="code-block">
+          <pre><code class="language-go">package main
+
+import (
+	"fmt"
+	"log"
+	"github.com/suapapa/go_kioom"
+)
+
+func main() {
+	client := kioom.NewClient("YOUR_APP_KEY", "YOUR_SECRET_KEY", true)
+
+	tokenRes, err := client.IssueToken()
+	if err != nil {
+		log.Fatalf("토큰 발급 실패: %v", err)
+	}
+	
+	acctRes, err := client.GetAccountNumber()
+	if err != nil {
+		log.Printf("계좌번호 조회 실패: %v", err)
+	} else {
+		fmt.Printf("계좌번호: %s\n", acctRes.AcctNo)
+	}
+}</code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; Homin Lee &lt;i@homin.dev&gt;</p>
+        <div class="footer-links">
+          <a href="https://github.com/suapapa/go_kioom/blob/main/IMPLEMENTATION_STATUS.md">구현 현황</a>
+          <a href="https://github.com/suapapa/go_kioom/tree/main/cmd/examples">더 많은 예제</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
+</body>
+</html>
