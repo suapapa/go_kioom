@@ -21,9 +21,10 @@ type Client struct {
 	secretKey  string
 	httpClient *http.Client
 
-	mu      sync.RWMutex
-	token   string
-	tokenMu sync.Mutex
+	mu             sync.RWMutex
+	token          string
+	tokenExpiresAt time.Time
+	tokenMu        sync.Mutex
 
 	autoToken bool
 }
@@ -72,10 +73,13 @@ func NewClient(appKey, secretKey string, opts ...Option) *Client {
 }
 
 // SetToken sets the OAuth token manually.
+// Expiry is unknown for manually supplied tokens; they are refreshed when the
+// API reports an auth error or when IssueToken runs after expiry is known.
 func (c *Client) SetToken(token string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.token = token
+	c.tokenExpiresAt = time.Time{}
 }
 
 // Token returns the current access token.
@@ -93,25 +97,36 @@ func (c *Client) BaseURL() string {
 // newRequest constructs a generic http.Request with required headers for Kiwoom API.
 func (c *Client) newRequest(ctx context.Context, method, path, apiID string, body interface{}) (*http.Request, error) {
 	// Avoid recursion/loop when calling token issue or revoke endpoints
-	if c.autoToken && path != "/oauth2/token" && path != "/oauth2/revoke" {
-		if c.Token() == "" {
+	if c.autoToken && !isAuthEndpoint(path) {
+		if !c.tokenValidAt(time.Now()) {
 			if _, err := c.IssueToken(ctx); err != nil {
 				return nil, fmt.Errorf("auto-issue token: %w", err)
 			}
 		}
 	}
 
-	var bodyReader io.Reader
+	var bodyBytes []byte
 	if body != nil {
 		var buf bytes.Buffer
 		if err := json.NewEncoder(&buf).Encode(body); err != nil {
 			return nil, fmt.Errorf("encode body: %w", err)
 		}
-		bodyReader = bytes.NewReader(buf.Bytes())
+		bodyBytes = buf.Bytes()
+	}
+
+	var bodyReader io.Reader
+	if bodyBytes != nil {
+		bodyReader = bytes.NewReader(bodyBytes)
 	}
 	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+path, bodyReader)
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
+	}
+	if bodyBytes != nil {
+		req.GetBody = func() (io.ReadCloser, error) {
+			return io.NopCloser(bytes.NewReader(bodyBytes)), nil
+		}
+		req.ContentLength = int64(len(bodyBytes))
 	}
 
 	req.Header.Set("Content-Type", "application/json;charset=UTF-8")
@@ -129,44 +144,38 @@ func (c *Client) newRequest(ctx context.Context, method, path, apiID string, bod
 
 // do makes the actual HTTP request and parses into 'v'.
 func (c *Client) do(req *http.Request, v interface{}) error {
+	return c.doOnce(req, v, false)
+}
+
+func (c *Client) doOnce(req *http.Request, v interface{}, retried bool) error {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("do request: %w", err)
 	}
 	defer resp.Body.Close()
 
-	if c.autoToken && resp.StatusCode == http.StatusUnauthorized && req.URL.Path != "/oauth2/token" && req.URL.Path != "/oauth2/revoke" {
-		_, err := c.IssueTokenForce(req.Context())
-		if err != nil {
-			return fmt.Errorf("auto-refresh token failed: %w", err)
-		}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("read response: %w", err)
+	}
 
-		req.Header.Set("authorization", "Bearer "+c.Token())
-
-		if req.GetBody != nil {
-			body, err := req.GetBody()
-			if err != nil {
-				return fmt.Errorf("get body for retry: %w", err)
-			}
-			req.Body = body
-		}
-
-		resp2, err := c.httpClient.Do(req)
-		if err != nil {
-			return fmt.Errorf("retry request: %w", err)
-		}
-		defer resp2.Body.Close()
-
-		if resp2.StatusCode < 200 || resp2.StatusCode >= 300 {
-			return fmt.Errorf("API request failed with status: %s (retry)", resp2.Status)
-		}
-
-		if v != nil {
-			if err := json.NewDecoder(resp2.Body).Decode(v); err != nil {
-				return fmt.Errorf("decode response (retry): %w", err)
+	if c.autoToken && !retried && !isAuthEndpoint(req.URL.Path) {
+		shouldRetry := resp.StatusCode == http.StatusUnauthorized
+		if !shouldRetry && resp.StatusCode >= 200 && resp.StatusCode < 300 {
+			var meta apiResponseMeta
+			if err := json.Unmarshal(body, &meta); err == nil {
+				shouldRetry = isTokenAuthError(meta)
 			}
 		}
-		return nil
+		if shouldRetry {
+			if _, err := c.IssueTokenForce(req.Context()); err != nil {
+				return fmt.Errorf("auto-refresh token failed: %w", err)
+			}
+			if err := c.replayRequest(req); err != nil {
+				return err
+			}
+			return c.doOnce(req, v, true)
+		}
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
@@ -174,10 +183,23 @@ func (c *Client) do(req *http.Request, v interface{}) error {
 	}
 
 	if v != nil {
-		if err := json.NewDecoder(resp.Body).Decode(v); err != nil {
+		if err := json.Unmarshal(body, v); err != nil {
 			return fmt.Errorf("decode response: %w", err)
 		}
 	}
 
+	return nil
+}
+
+func (c *Client) replayRequest(req *http.Request) error {
+	req.Header.Set("authorization", "Bearer "+c.Token())
+	if req.GetBody == nil {
+		return nil
+	}
+	body, err := req.GetBody()
+	if err != nil {
+		return fmt.Errorf("get body for retry: %w", err)
+	}
+	req.Body = body
 	return nil
 }

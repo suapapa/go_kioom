@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 // TokenRequest contains the credentials required to request a new access token.
@@ -43,13 +44,10 @@ func (c *Client) IssueToken(ctx context.Context) (*TokenResponse, error) {
 	defer c.tokenMu.Unlock()
 
 	// Double-check if the token was already refreshed by another concurrent request.
-	if currentToken := c.Token(); currentToken != "" {
-		return &TokenResponse{
-			Token:      currentToken,
-			ReturnCode: 0,
-			ReturnMsg:  "success (cached)",
-		}, nil
+	if c.tokenValidAt(time.Now()) {
+		return c.cachedTokenResponse(), nil
 	}
+	c.clearToken()
 
 	reqBody := TokenRequest{
 		GrantType: "client_credentials",
@@ -71,16 +69,18 @@ func (c *Client) IssueToken(ctx context.Context) (*TokenResponse, error) {
 		return &res, fmt.Errorf("issue token failed: %s", res.ReturnMsg)
 	}
 
-	// Save token so consequent calls uses this Bearer token automatically
-	c.SetToken(res.Token)
+	expiresAt, err := parseExpiresDt(res.ExpiresDt)
+	if err != nil {
+		c.setTokenWithExpiry(res.Token, time.Time{})
+	} else {
+		c.setTokenWithExpiry(res.Token, expiresAt)
+	}
 	return &res, nil
 }
 
 // IssueTokenForce forcibly issues a new token even if a cached one exists.
 func (c *Client) IssueTokenForce(ctx context.Context) (*TokenResponse, error) {
-	c.mu.Lock()
-	c.token = ""
-	c.mu.Unlock()
+	c.clearToken()
 	return c.IssueToken(ctx)
 }
 
@@ -109,6 +109,6 @@ func (c *Client) RevokeToken(ctx context.Context) (*RevokeResponse, error) {
 	}
 
 	// Purge token logically after revocation
-	c.SetToken("")
+	c.clearToken()
 	return &res, nil
 }
