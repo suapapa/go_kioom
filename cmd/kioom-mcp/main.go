@@ -30,7 +30,7 @@ func main() {
 	transport := flag.String("transport", "stdio", "Transport: stdio or sse")
 	listen := flag.String("listen", "127.0.0.1:8765", "Listen address for -transport=sse")
 	ssePath := flag.String("sse-path", "/", "HTTP path prefix for -transport=sse (non-root paths get a trailing / for POST session routing)")
-	sseToken := flag.String("sse-token", os.Getenv("KIOOM_MCP_SSE_TOKEN"), "Bearer token to authenticate incoming SSE client connections")
+	authToken := flag.String("auth-token", os.Getenv("KIOOM_MCP_AUTH_TOKEN"), "Bearer token to authenticate incoming SSE client connections")
 	logFormat := flag.String("log-format", "text", "Log output format: text (human-readable) or json")
 
 	flag.Parse()
@@ -119,7 +119,7 @@ func main() {
 			fatal(logger, "stdio transport stopped", "error", err)
 		}
 	case "sse":
-		if err := runSSE(logger, srv, *listen, normalizeSSEPath(*ssePath), *sseToken); err != nil {
+		if err := runSSE(logger, srv, *listen, normalizeSSEPath(*ssePath), *authToken); err != nil {
 			fatal(logger, "sse transport stopped", "error", err)
 		}
 	default:

@@ -31,7 +31,7 @@ go build -o bin/kioom-mcp ./cmd/kioom-mcp
 | `KIOOM_SECRET_KEY` | 시크릿 키 (**필수**) |
 | `KIOOM_TOKEN` | 이미 발급된 Bearer 토큰이 있으면 설정 (선택) |
 | `KIOOM_MOCK` | `true`이면 모의투자(mock) API 도메인 사용 |
-| `KIOOM_MCP_SSE_TOKEN` | SSE 클라이언트 인증에 쓰는 Bearer 토큰 (선택) |
+| `KIOOM_MCP_AUTH_TOKEN` | MCP SSE 클라이언트 인증에 쓰는 Bearer 토큰 (선택) |
 
 `KIOOM_APP_KEY`와 `KIOOM_SECRET_KEY`가 없으면 프로세스는 바로 종료됩니다.
 
@@ -42,7 +42,7 @@ go build -o bin/kioom-mcp ./cmd/kioom-mcp
 | `-transport` | `stdio` | `stdio` 또는 `sse` |
 | `-listen` | `127.0.0.1:8765` | `-transport=sse`일 때 `host:port` |
 | `-sse-path` | `/` | SSE 핸들러를 붙일 URL 경로. 루트가 아니면 내부에서 끝에 `/`가 붙을 수 있음(Go 1.22+ `ServeMux` 서브트리 매칭) |
-| `-sse-token` | (환경변수값) | SSE 클라이언트 인증용 Bearer 토큰. 설정하면 클라이언트는 HTTP Header (`Authorization: Bearer <토큰>`) 또는 URL 쿼리 (`?token=<토큰>` 또는 `?auth=<토큰>`)로 인증해야 합니다. |
+| `-auth-token` | (환경변수값) | MCP SSE 클라이언트 인증용 Bearer 토큰. 설정하면 클라이언트는 HTTP Header (`Authorization: Bearer <토큰>`) 또는 URL 쿼리 (`?token=<토큰>` 또는 `?auth=<토큰>`)로 인증해야 합니다. |
 | `-log-format` | `text` | 로그 출력 형식: `text`(사람이 읽기 쉬운 형식) 또는 `json`(구조화 JSON) |
 
 SIGINT/SIGTERM으로 종료할 때 **SSE 모드**는 `http.Server.Shutdown`으로 정리합니다(최대 10초).
@@ -91,7 +91,7 @@ export KIOOM_SECRET_KEY="..."
 kioom-mcp -transport sse -listen 127.0.0.1:8765 -sse-path /
 
 # 인증 토큰을 지정해 SSE 구동
-kioom-mcp -transport sse -listen 127.0.0.1:8765 -sse-path / -sse-token "my-secret-token"
+kioom-mcp -transport sse -listen 127.0.0.1:8765 -sse-path / -auth-token "my-secret-token"
 ```
 
 ### Docker로 SSE 구동
@@ -118,7 +118,7 @@ docker run -d \
   -e KIOOM_APP_KEY="your-app-key" \
   -e KIOOM_SECRET_KEY="your-secret-key" \
   -e KIOOM_MOCK="true" \
-  -e KIOOM_MCP_SSE_TOKEN="my-secret-token" \
+  -e KIOOM_MCP_AUTH_TOKEN="my-secret-token" \
   --name kioom-mcp-container \
   kioom-mcp-sse
 ```
