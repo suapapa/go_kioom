@@ -101,7 +101,7 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "stock_indicators",
-		Description: "Comprehensive fundamental stock indicators for stk_cd (six digits) including computed margins and exact foreign ownership ratio.",
+		Description: "Comprehensive fundamental stock indicators for stk_cd (six digits) including computed margins and foreign ownership weight (ka10008 wght).",
 	}, func(ctx context.Context, req *mcp.CallToolRequest, in struct {
 		StkCd string `json:"stk_cd" jsonschema:"required six-digit stock code"`
 	}) (*mcp.CallToolResult, *kioom.StockIndicatorResponse, error) {

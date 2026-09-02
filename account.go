@@ -76,6 +76,9 @@ type AccountBalanceResponse struct {
 	TotalEvalPL      string               `json:"tot_evlt_pl"`        // 총평가손익금액
 	TotalProfitRate  string               `json:"tot_prft_rt"`        // 총수익률(%)
 	AssetAmt         string               `json:"prsm_dpst_aset_amt"` // 추정예탁자산
+	TotalLoanAmt     string               `json:"tot_loan_amt"`       // 총대출금
+	TotalCrdLoanAmt  string               `json:"tot_crd_loan_amt"`   // 총융자금액
+	TotalCrdLsAmt    string               `json:"tot_crd_ls_amt"`     // 총대주금액
 	Items            []AccountBalanceItem `json:"acnt_evlt_remn_indv_tot"`
 	ReturnCode       int                  `json:"return_code"` // 0 for success
 	ReturnMsg        string               `json:"return_msg"`  // Error message if return_code is not 0
@@ -83,16 +86,29 @@ type AccountBalanceResponse struct {
 
 // AccountBalanceItem represents a single stock item in the account balance.
 type AccountBalanceItem struct {
-	StockCode    string `json:"stk_cd"`        // 종목번호
-	StockName    string `json:"stk_nm"`        // 종목명
-	EvalPL       string `json:"evltv_prft"`    // 평가손익
-	ProfitRate   string `json:"prft_rt"`       // 수익률(%)
-	PurchasePric string `json:"pur_pric"`      // 매입가
-	Quantity     string `json:"rmnd_qty"`      // 보유수량
-	TradeAbleQty string `json:"trde_able_qty"` // 매매가능수량
-	CurrentPrice string `json:"cur_prc"`       // 현재가
-	PurchaseAmt  string `json:"pur_amt"`       // 매입금액
-	EvalAmt      string `json:"evlt_amt"`      // 평가금액
+	StockCode     string `json:"stk_cd"`          // 종목번호
+	StockName     string `json:"stk_nm"`          // 종목명
+	EvalPL        string `json:"evltv_prft"`      // 평가손익
+	ProfitRate    string `json:"prft_rt"`         // 수익률(%)
+	PurchasePric  string `json:"pur_pric"`        // 매입가
+	PredClosePric string `json:"pred_close_pric"` // 전일종가
+	Quantity      string `json:"rmnd_qty"`        // 보유수량
+	TradeAbleQty  string `json:"trde_able_qty"`   // 매매가능수량
+	CurrentPrice  string `json:"cur_prc"`         // 현재가
+	PredBuyQty    string `json:"pred_buyq"`       // 전일매수수량
+	PredSellQty   string `json:"pred_sellq"`      // 전일매도수량
+	TdyBuyQty     string `json:"tdy_buyq"`        // 금일매수수량
+	TdySellQty    string `json:"tdy_sellq"`       // 금일매도수량
+	PurchaseAmt   string `json:"pur_amt"`         // 매입금액
+	PurchaseCmsn  string `json:"pur_cmsn"`        // 매입수수료
+	EvalAmt       string `json:"evlt_amt"`        // 평가금액
+	SellCmsn      string `json:"sell_cmsn"`       // 평가수수료
+	Tax           string `json:"tax"`             // 세금
+	SumCmsn       string `json:"sum_cmsn"`        // 수수료합
+	PossRt        string `json:"poss_rt"`         // 보유비중(%)
+	CrdTp         string `json:"crd_tp"`          // 신용구분
+	CrdTpNm       string `json:"crd_tp_nm"`       // 신용구분명
+	CrdLoanDt     string `json:"crd_loan_dt"`     // 대출일
 }
 
 // GetAccountBalance retrieves the account balance information including stock items.

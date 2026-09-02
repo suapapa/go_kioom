@@ -79,7 +79,7 @@ func main() {
 
 ## 구현 현황
 
-Kiwoom REST API 전체 구현 목록과 진행 상태는 [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md)에서 확인할 수 있습니다.
+Kiwoom REST API 전체 구현 목록과 진행 상태는 [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md)에서 확인할 수 있습니다. API 필드·TR 코드는 공식 스펙 [`_ref/kiwoom-rest-api-spec.json`](_ref/kiwoom-rest-api-spec.json)을 기준으로 합니다.
 
 ### 확장 가이드
 

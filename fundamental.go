@@ -6,37 +6,46 @@ import (
 	"net/http"
 )
 
-// StockInstitutionsRequest represents the request to get institutional/foreign stock flows.
-type StockInstitutionsRequest struct {
-	StkCd string `json:"stk_cd"` // Stock code (6-digit)
+// StockForeignInvestorRequest represents the request for foreign investor trading trends.
+type StockForeignInvestorRequest struct {
+	StkCd string `json:"stk_cd"` // Stock code (KRX/NXT/SOR suffix supported)
 }
 
-// StockInstitutionsResponse represents the response containing institutional/foreign stock flows.
-type StockInstitutionsResponse struct {
-	Date             string `json:"date"`               // Date
-	ClosePric        string `json:"close_pric"`         // Close price
-	Pre              string `json:"pre"`                // Change from previous
-	OrgnDtAcc        string `json:"orgn_dt_acc"`        // Cumulative institution volume
-	OrgnDalyNettrde  string `json:"orgn_daly_nettrde"`  // Institution daily net trade
-	FrgnrDalyNettrde string `json:"frgnr_daly_nettrde"` // Foreigner daily net trade
-	FrgnrQotaRt      string `json:"frgnr_qota_rt"`      // Foreigner ownership ratio (외국인지분율)
-	ReturnCode       int    `json:"return_code"`
-	ReturnMsg        string `json:"return_msg"`
+// StockForeignInvestorItem represents one day's foreign investor activity.
+type StockForeignInvestorItem struct {
+	Dt             string `json:"dt"`               // Date (YYYYMMDD)
+	ClosePric      string `json:"close_pric"`       // Close price
+	PredPre        string `json:"pred_pre"`         // Change from previous day
+	TrdeQty        string `json:"trde_qty"`         // Trading volume
+	ChgQty         string `json:"chg_qty"`          // Change in holdings
+	PossStkcnt     string `json:"poss_stkcnt"`      // Shares held
+	Wght           string `json:"wght"`             // Ownership weight (%)
+	GainPosStkcnt  string `json:"gain_pos_stkcnt"`  // Acquirable shares
+	FrgnrLimit     string `json:"frgnr_limit"`      // Foreign ownership limit
+	FrgnrLimitIrds string `json:"frgnr_limit_irds"` // Change in foreign limit
+	LimitExhRt     string `json:"limit_exh_rt"`     // Limit exhaustion rate (%)
 }
 
-// GetStockInstitutions retrieves daily trading values and foreign ownership ratio for a stock.
-// See Kiwoom API ID: ka10009
-func (c *Client) GetStockInstitutions(ctx context.Context, stockCode string) (*StockInstitutionsResponse, error) {
-	reqBody := StockInstitutionsRequest{
+// StockForeignInvestorResponse contains daily foreign investor trading trends.
+type StockForeignInvestorResponse struct {
+	StkFrgnr   []StockForeignInvestorItem `json:"stk_frgnr"`
+	ReturnCode int                        `json:"return_code"`
+	ReturnMsg  string                     `json:"return_msg"`
+}
+
+// GetStockForeignInvestor retrieves daily foreign investor trading trends for a stock.
+// See Kiwoom API ID: ka10008
+func (c *Client) GetStockForeignInvestor(ctx context.Context, stockCode string) (*StockForeignInvestorResponse, error) {
+	reqBody := StockForeignInvestorRequest{
 		StkCd: stockCode,
 	}
 
-	req, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/frgnistt", API_GetStockInstitutions, reqBody)
+	req, err := c.newRequest(ctx, http.MethodPost, "/api/dostk/frgnistt", API_GetStockForeignInvestor, reqBody)
 	if err != nil {
 		return nil, err
 	}
 
-	var res StockInstitutionsResponse
+	var res StockForeignInvestorResponse
 	if err := c.do(req, &res); err != nil {
 		return nil, err
 	}
@@ -57,10 +66,10 @@ type StockIndicatorResponse struct {
 	Per              string `json:"per"`                  // PER
 	Pbr              string `json:"pbr"`                  // PBR
 	Roe              string `json:"roe"`                  // ROE
-	High250PricPreRt string `json:"high_250_pric_pre_rt"` // 52주일최고가대비현재가대비
-	Low250PricPreRt  string `json:"low_250_pric_pre_rt"`  // 52주일최저가대비현재가대비
+	High250PricPreRt string `json:"high_250_pric_pre_rt"` // 52-week high vs current
+	Low250PricPreRt  string `json:"low_250_pric_pre_rt"`  // 52-week low vs current
 	ForExhRt         string `json:"for_exh_rt"`           // 외인소진률 (Foreigner exhaustion rate)
-	ForQotaRt        string `json:"for_qota_rt"`          // 외국인지분율 (Foreigner ownership ratio)
+	ForQotaRt        string `json:"for_qota_rt"`          // 외국인지분율 (Foreign ownership weight from ka10008)
 	SaleAmt          string `json:"sale_amt"`             // 매출액 (Revenue)
 	BusPro           string `json:"bus_pro"`              // 영업이익 (Operating Profit)
 	CupNga           string `json:"cup_nga"`              // 당기순이익 (Net Income)
@@ -70,19 +79,23 @@ type StockIndicatorResponse struct {
 	ReturnMsg        string `json:"return_msg"`
 }
 
-// GetStockIndicators retrieves a comprehensive summary of stock indicators, merging basic info and institutional data.
+// GetStockIndicators retrieves a comprehensive summary of stock indicators, merging basic info and foreign investor data.
 func (c *Client) GetStockIndicators(ctx context.Context, stockCode string) (*StockIndicatorResponse, error) {
 	basic, err := c.GetStockBasicInfo(ctx, stockCode)
 	if err != nil {
 		return nil, err
 	}
 
-	inst, err := c.GetStockInstitutions(ctx, stockCode)
+	frgnr, err := c.GetStockForeignInvestor(ctx, stockCode)
 	if err != nil {
 		return nil, err
 	}
 
-	// Calculate operating margin: (bus_pro / sale_amt) * 100
+	forQotaRt := ""
+	if len(frgnr.StkFrgnr) > 0 {
+		forQotaRt = frgnr.StkFrgnr[0].Wght
+	}
+
 	busProVal := parseFloat(basic.BusPro)
 	saleAmtVal := parseFloat(basic.SaleAmt)
 	opMargin := "0.00%"
@@ -90,7 +103,6 @@ func (c *Client) GetStockIndicators(ctx context.Context, stockCode string) (*Sto
 		opMargin = fmt.Sprintf("%.2f%%", (busProVal/saleAmtVal)*100)
 	}
 
-	// Calculate net profit margin: (cup_nga / sale_amt) * 100
 	cupNgaVal := parseFloat(basic.CupNga)
 	npMargin := "0.00%"
 	if saleAmtVal != 0 {
@@ -107,7 +119,7 @@ func (c *Client) GetStockIndicators(ctx context.Context, stockCode string) (*Sto
 		High250PricPreRt: basic.High250PricPreRt,
 		Low250PricPreRt:  basic.Low250PricPreRt,
 		ForExhRt:         basic.ForExhRt,
-		ForQotaRt:        inst.FrgnrQotaRt,
+		ForQotaRt:        forQotaRt,
 		SaleAmt:          basic.SaleAmt,
 		BusPro:           basic.BusPro,
 		CupNga:           basic.CupNga,

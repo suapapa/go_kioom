@@ -16,7 +16,7 @@ type TokenRequest struct {
 
 // TokenResponse contains the issued access token and its metadata.
 type TokenResponse struct {
-	ExpiresDt  string `json:"expires_dt"`  // Format: YYYY-MM-DD HH:MM:SS
+	ExpiresDt  string `json:"expires_dt"`  // Format: YYYYMMDDHHMMSS (KST)
 	TokenType  string `json:"token_type"`  // Should be "Bearer"
 	Token      string `json:"token"`       // The access token itself
 	ReturnCode int    `json:"return_code"` // 0 for success
