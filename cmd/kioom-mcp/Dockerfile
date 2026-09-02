@@ -1,7 +1,7 @@
 # Multi-stage build for kioom-mcp (SSE Transport mode)
 
 # --- Build Stage ---
-FROM --platform=$BUILDPLATFORM golang:1.26-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.27-alpine AS builder
 
 # git 및 SSL 인증서 빌드 타임 의존성 설치
 RUN apk add --no-cache git ca-certificates
@@ -36,7 +36,7 @@ COPY --from=builder /kioom-mcp /app/kioom-mcp
 # 컨테이너 포트 노출 (SSE 기본 포트: 8765)
 EXPOSE 8765
 
-# NOTE: 런타임 자격 증명(KIOOM_APP_KEY, KIOOM_SECRET_KEY 등)은 보안을 위해 Dockerfile에 
+# NOTE: 런타임 자격 증명(KIOOM_APP_KEY, KIOOM_SECRET_KEY 등)은 보안을 위해 Dockerfile에
 # ENV/ARG로 하드코딩하지 않습니다. 대신 다음과 같은 방법으로 주입하십시오:
 #   1. 컨테이너 실행 시 환경 변수로 주입: -e KIOOM_APP_KEY="xxx" -e KIOOM_SECRET_KEY="xxx"
 #   2. 컨테이너 실행 시 .env 파일 주입: --env-file .env
