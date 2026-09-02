@@ -188,3 +188,134 @@ func ValidateVolumeSurgeRequest(req *kioom.VolumeSurgeRequest) error {
 
 	return nil
 }
+
+var reUSTicker = regexp.MustCompile(`^[A-Za-z0-9]{1,12}$`)
+
+// ValidateUSTicker checks that code is a valid US stock/ETF ticker (1-12 alphanumeric).
+func ValidateUSTicker(code string) error {
+	code = strings.TrimSpace(code)
+	if !reUSTicker.MatchString(code) {
+		return fmt.Errorf("invalid US ticker %q: expected 1-12 alphanumeric characters", code)
+	}
+	return nil
+}
+
+// ValidateUSExchangeType checks the US exchange type code.
+func ValidateUSExchangeType(stexTp string) error {
+	if err := validateUSExchangeTypeOptional(stexTp, false); err != nil {
+		return err
+	}
+	return nil
+}
+
+func validateUSExchangeTypeOptional(stexTp string, allowEmpty bool) error {
+	stexTp = strings.TrimSpace(stexTp)
+	if stexTp == "" {
+		if allowEmpty {
+			return nil
+		}
+		return fmt.Errorf("invalid stex_tp %q: expected one of [NA,ND,NY]", stexTp)
+	}
+	switch stexTp {
+	case "NA", "ND", "NY":
+		return nil
+	default:
+		return fmt.Errorf("invalid stex_tp %q: expected one of [NA,ND,NY]", stexTp)
+	}
+}
+
+var usBuyTradeTypes = map[string]struct{}{
+	"00": {}, "03": {}, "26": {}, "27": {}, "30": {}, "36": {}, "37": {},
+}
+
+var usSellTradeTypes = map[string]struct{}{
+	"00": {}, "03": {}, "26": {}, "27": {}, "30": {}, "33": {}, "34": {}, "35": {}, "36": {}, "37": {},
+}
+
+// ValidateUSOrderBuyRequest validates a US buy order request.
+func ValidateUSOrderBuyRequest(req *kioom.USOrderBuyRequest) error {
+	if err := ValidateUSExchangeType(req.StexTp); err != nil {
+		return err
+	}
+	if err := ValidateUSTicker(req.StkCd); err != nil {
+		return err
+	}
+	if _, ok := usBuyTradeTypes[req.TrdeTp]; !ok {
+		return fmt.Errorf("invalid trde_tp %q: expected one of [00,03,26,27,30,36,37]", req.TrdeTp)
+	}
+	return nil
+}
+
+// ValidateUSOrderSellRequest validates a US sell order request.
+func ValidateUSOrderSellRequest(req *kioom.USOrderSellRequest) error {
+	if err := ValidateUSExchangeType(req.StexTp); err != nil {
+		return err
+	}
+	if err := ValidateUSTicker(req.StkCd); err != nil {
+		return err
+	}
+	if _, ok := usSellTradeTypes[req.TrdeTp]; !ok {
+		return fmt.Errorf("invalid trde_tp %q: expected one of [00,03,26,27,30,33,34,35,36,37]", req.TrdeTp)
+	}
+	return nil
+}
+
+// ValidateUSOrderModifyRequest validates a US order modification request.
+func ValidateUSOrderModifyRequest(req *kioom.USOrderModifyRequest) error {
+	if err := ValidateUSExchangeType(req.StexTp); err != nil {
+		return err
+	}
+	if err := ValidateUSTicker(req.StkCd); err != nil {
+		return err
+	}
+	if strings.TrimSpace(req.OrigOrdNo) == "" {
+		return fmt.Errorf("orig_ord_no is required")
+	}
+	return nil
+}
+
+// ValidateUSOrderCancelRequest validates a US order cancel request.
+func ValidateUSOrderCancelRequest(req *kioom.USOrderCancelRequest) error {
+	if err := ValidateUSExchangeType(req.StexTp); err != nil {
+		return err
+	}
+	if err := ValidateUSTicker(req.StkCd); err != nil {
+		return err
+	}
+	if strings.TrimSpace(req.OrigOrdNo) == "" {
+		return fmt.Errorf("orig_ord_no is required")
+	}
+	return nil
+}
+
+// ValidateUSOpenOrdersRequest validates US open orders query parameters.
+func ValidateUSOpenOrdersRequest(req *kioom.USOpenOrdersRequest) error {
+	if err := validateUSExchangeTypeOptional(req.StexTp, true); err != nil {
+		return err
+	}
+	if req.StkCd != "" {
+		if err := ValidateUSTicker(req.StkCd); err != nil {
+			return err
+		}
+	}
+	if req.OrdDt != "" && len(req.OrdDt) != 8 {
+		return fmt.Errorf("invalid ord_dt %q: expected 8 characters (YYYYMMDD)", req.OrdDt)
+	}
+	switch req.SlbyTp {
+	case "", "0", "1", "2":
+		return nil
+	default:
+		return fmt.Errorf("invalid slby_tp %q: expected one of [0,1,2]", req.SlbyTp)
+	}
+}
+
+// ValidateUSAccountBalanceRequest validates US balance query parameters.
+func ValidateUSAccountBalanceRequest(req *kioom.USAccountBalanceRequest) error {
+	if err := validateUSExchangeTypeOptional(req.StexTp, true); err != nil {
+		return err
+	}
+	if req.StkCd != "" {
+		return ValidateUSTicker(req.StkCd)
+	}
+	return nil
+}

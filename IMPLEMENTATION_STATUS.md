@@ -4,7 +4,7 @@ Implementation progress for the Kiwoom REST API Go wrapper.
 
 Official API reference: [`_ref/kiwoom-rest-api-spec.json`](./_ref/kiwoom-rest-api-spec.json) (347 endpoints).
 
-**Summary:** 23 / 347 endpoints implemented (6%).
+**Summary:** 261 / 347 endpoints implemented (75%).
 
 ## 🔑 OAuth 인증
 - [x] `au10001` - [접근토큰 발급](./auth.go) (`IssueToken`)
@@ -12,278 +12,150 @@ Official API reference: [`_ref/kiwoom-rest-api-spec.json`](./_ref/kiwoom-rest-ap
 
 ## 👤 계좌
 - [x] `ka00001` - [계좌번호조회](./account.go) (`GetAccountNumber`)
-- [ ] `ka01690` - 일별잔고수익률
-- [ ] `ka10072` - 일자별종목별실현손익요청_일자
-- [ ] `ka10073` - 일자별종목별실현손익요청_기간
-- [ ] `ka10074` - 일자별실현손익요청
-- [ ] `ka10075` - 미체결요청
-- [ ] `ka10076` - 체결요청
-- [ ] `ka10077` - 당일실현손익상세요청
-- [ ] `ka10085` - 계좌수익률요청
-- [ ] `ka10088` - 미체결 분할주문 상세
+- [x] `ka10072` - [일자별종목별실현손익요청_일자](./api_registry_gen.go) (`GetDailyStockRealizedPLByDate`)
+- [x] `ka10073` - [일자별종목별실현손익요청_기간](./api_registry_gen.go) (`GetDailyStockRealizedPLByPeriod`)
+- [x] `ka10074` - [일자별실현손익요청](./api_registry_gen.go) (`GetDailyRealizedPL`)
+- [x] `ka10075` - [미체결요청](./api_registry_gen.go) (`GetOpenOrders`)
+- [x] `ka10076` - [체결요청](./api_registry_gen.go) (`GetExecutions`)
+- [x] `ka10077` - [당일실현손익상세요청](./api_registry_gen.go) (`GetTodayRealizedPLDetail`)
+- [x] `ka10078` - [증권사별종목매매동향요청](./api_registry_gen.go) (`GetSecuritiesFirmStockTradingTrend`)
+- [x] `ka10084` - [당일전일체결요청](./api_registry_gen.go) (`GetTodayPreviousExecution`)
+- [x] `ka10085` - [계좌수익률요청](./api_registry_gen.go) (`GetAccountReturnRate`)
+- [x] `ka10086` - [일별주가요청](./api_registry_gen.go) (`GetDailyStockPrice`)
+- [x] `ka10087` - [시간외단일가요청](./api_registry_gen.go) (`GetAfterHoursSinglePrice`)
+- [x] `ka10088` - [미체결 분할주문 상세](./api_registry_gen.go) (`GetOpenOrderSplitDetail`)
 - [x] `kt00001` - [예수금상세현황요청](./account.go) (`GetDeposit`)
-- [ ] `kt00002` - 일별추정예탁자산현황요청
-- [ ] `kt00003` - 추정자산조회요청
-- [ ] `kt00004` - 계좌평가현황요청
-- [ ] `kt00005` - 체결잔고요청
-- [ ] `kt00007` - 계좌별주문체결내역상세요청
-- [ ] `kt00008` - 계좌별익일결제예정내역요청
-- [ ] `kt00009` - 계좌별주문체결현황요청
-- [ ] `kt00010` - 주문인출가능금액요청
-- [ ] `kt00011` - 증거금율별주문가능수량조회요청
-- [ ] `kt00012` - 신용보증금율별주문가능수량조회요청
-- [ ] `kt00013` - 증거금세부내역조회요청
-- [ ] `kt00015` - 위탁종합거래내역요청
-- [ ] `kt00016` - 일별계좌수익률상세현황요청
-- [ ] `kt00017` - 계좌별당일현황요청
+- [x] `kt00002` - [일별추정예탁자산현황요청](./api_registry_gen.go) (`GetDailyEstimatedCustodyAssets`)
+- [x] `kt00003` - [추정자산조회요청](./api_registry_gen.go) (`GetEstimatedAssets`)
+- [x] `kt00004` - [계좌평가현황요청](./api_registry_gen.go) (`GetAccountEvaluation`)
+- [x] `kt00005` - [체결잔고요청](./api_registry_gen.go) (`GetExecutionBalance`)
+- [x] `kt00007` - [계좌별주문체결내역상세요청](./api_registry_gen.go) (`GetAccountOrderExecutionDetail`)
+- [x] `kt00008` - [계좌별익일결제예정내역요청](./api_registry_gen.go) (`GetAccountNextDaySettlement`)
+- [x] `kt00009` - [계좌별주문체결현황요청](./api_registry_gen.go) (`GetAccountOrderExecutionStatus`)
+- [x] `kt00010` - [주문인출가능금액요청](./api_registry_gen.go) (`GetWithdrawableOrderAmount`)
+- [x] `kt00011` - [증거금율별주문가능수량조회요청](./api_registry_gen.go) (`GetOrderableQtyByMarginRate`)
+- [x] `kt00012` - [신용보증금율별주문가능수량조회요청](./api_registry_gen.go) (`GetOrderableQtyByCreditMarginRate`)
+- [x] `kt00013` - [증거금세부내역조회요청](./api_registry_gen.go) (`GetMarginDetail`)
+- [x] `kt00015` - [위탁종합거래내역요청](./api_registry_gen.go) (`GetConsolidatedTradeHistory`)
+- [x] `kt00016` - [일별계좌수익률상세현황요청](./api_registry_gen.go) (`GetDailyAccountReturnDetail`)
+- [x] `kt00017` - [계좌별당일현황요청](./api_registry_gen.go) (`GetAccountTodayStatus`)
 - [x] `kt00018` - [계좌평가잔고내역요청](./account.go) (`GetAccountBalance`)
-- [ ] `kt20016` - 신용융자 가능종목요청
-- [ ] `kt20017` - 신용융자 가능문의
-- [ ] `usa21670` - 미국주식 일별계좌수익률현황
-- [ ] `usa21680` - 미국주식 월별계좌수익률현황
-- [ ] `usa21690` - 미국주식 연도별계좌수익률현황
-- [ ] `usa21730` - 미국주식 일별종목수익률현황
-- [ ] `usa21731` - 미국주식 월별종목수익률현황
-- [ ] `usa21732` - 미국주식 연도별종목수익률현황
-- [ ] `ust21050` - 미국주식 원장 미체결
-- [ ] `ust21070` - 미국주식 원장잔고확인
-- [ ] `ust21100` - 미국주식 거래내역
-- [ ] `ust21110` - 해외주식 예수금
-- [ ] `ust21111` - 원화출금가능 금액 조회(원화대용 포함)
-- [ ] `ust21120` - 통화별 예수금 및 증권 평가금현황
-- [ ] `ust21121` - 해외증권 원장 평가금액현황
-- [ ] `ust21131` - 해외증권 특정일 평가금액
-- [ ] `ust21132` - 특정일 통화별 예수금 및 증권 평가금
-- [ ] `ust21150` - 미국주식 일별 주문체결내역
-- [ ] `ust21160` - 미국주식 예수금 상세
-- [ ] `ust21170` - 미국주식 당일 종목별 실현손익
-- [ ] `ust21180` - 미국주식 기간별 주문내역
-- [ ] `ust21510` - 미국주식 당일 주문체결 확인
-- [ ] `ust21530` - 미국주식 실현손익
-- [ ] `ust21610` - 미국주식 당일매매
-- [ ] `ust21620` - 미국주식 당일매매정리
-- [ ] `ust21630` - 미국주식 당일 실현손익
-- [ ] `ust21640` - 미국주식 일별 종목별 실현손익
-- [ ] `ust21650` - 미국주식 기간별 수익률 현황
-- [ ] `ust21660` - 미국주식 일별 실현손익
-- [ ] `ust21661` - 미국주식 월별 실현손익
+- [x] `usa21670` - [미국주식 일별계좌수익률현황](./api_registry_gen.go) (`GetUSStockDailyAccountReturn`)
+- [x] `usa21680` - [미국주식 월별계좌수익률현황](./api_registry_gen.go) (`GetUSStockMonthlyAccountReturn`)
+- [x] `usa21690` - [미국주식 연도별계좌수익률현황](./api_registry_gen.go) (`GetUSStockYearlyAccountReturn`)
+- [x] `usa21730` - [미국주식 일별종목수익률현황](./api_registry_gen.go) (`GetUSStockDailyStockReturn`)
+- [x] `usa21731` - [미국주식 월별종목수익률현황](./api_registry_gen.go) (`GetUSStockMonthlyStockReturn`)
+- [x] `usa21732` - [미국주식 연도별종목수익률현황](./api_registry_gen.go) (`GetUSStockYearlyStockReturn`)
+- [x] `ust21100` - [미국주식 거래내역](./api_registry_gen.go) (`GetUSTradeHistory`)
+- [x] `ust21111` - [원화출금가능 금액 조회(원화대용 포함)](./api_registry_gen.go) (`GetUSKRWWithdrawableAmount`)
+- [x] `ust21120` - [통화별 예수금 및 증권 평가금현황](./api_registry_gen.go) (`GetUSDepositEvaluationByCurrency`)
+- [x] `ust21121` - [해외증권 원장 평가금액현황](./api_registry_gen.go) (`GetUSLedgerEvaluation`)
+- [x] `ust21131` - [해외증권 특정일 평가금액](./api_registry_gen.go) (`GetUSEvaluationOnDate`)
+- [x] `ust21132` - [특정일 통화별 예수금 및 증권 평가금](./api_registry_gen.go) (`GetUSDepositEvaluationOnDate`)
+- [x] `ust21150` - [미국주식 일별 주문체결내역](./api_registry_gen.go) (`GetUSDailyOrderExecutionHistory`)
+- [x] `ust21160` - [미국주식 예수금 상세](./api_registry_gen.go) (`GetUSDepositDetail`)
+- [x] `ust21170` - [미국주식 당일 종목별 실현손익](./api_registry_gen.go) (`GetUSTodayStockRealizedPL`)
+- [x] `ust21180` - [미국주식 기간별 주문내역](./api_registry_gen.go) (`GetUSPeriodOrderHistory`)
+- [x] `ust21200` - [미국주식 예약 매수주문](./api_registry_gen.go) (`USOrderReserveBuy`)
+- [x] `ust21201` - [미국주식 예약 매도주문](./api_registry_gen.go) (`USOrderReserveSell`)
+- [x] `ust21203` - [미국주식 예약주문 취소](./api_registry_gen.go) (`USOrderReserveCancel`)
+- [x] `ust21204` - [미국주식 일자별 예약내역 조회](./api_registry_gen.go) (`GetUSReserveOrderHistoryByDate`)
+- [x] `ust21205` - [미국주식 예약주문 내역조회](./api_registry_gen.go) (`GetUSReserveOrders`)
+- [x] `ust21510` - [미국주식 당일 주문체결 확인](./api_registry_gen.go) (`GetUSTodayOrderExecutionConfirm`)
+- [x] `ust21530` - [미국주식 실현손익](./api_registry_gen.go) (`GetUSRealizedPL`)
+- [x] `ust21610` - [미국주식 당일매매](./api_registry_gen.go) (`GetUSTodayTrading`)
+- [x] `ust21620` - [미국주식 당일매매정리](./api_registry_gen.go) (`GetUSTodayTradingSummary`)
+- [x] `ust21630` - [미국주식 당일 실현손익](./api_registry_gen.go) (`GetUSTodayRealizedPL`)
+- [x] `ust21640` - [미국주식 일별 종목별 실현손익](./api_registry_gen.go) (`GetUSDailyStockRealizedPL`)
+- [x] `ust21650` - [미국주식 기간별 수익률 현황](./api_registry_gen.go) (`GetUSPeriodReturn`)
+- [x] `ust21660` - [미국주식 일별 실현손익](./api_registry_gen.go) (`GetUSDailyRealizedPL`)
+- [x] `ust21661` - [미국주식 월별 실현손익](./api_registry_gen.go) (`GetUSMonthlyRealizedPL`)
 
 ## 📈 종목정보/시세
-- [x] `ka00198` - [실시간종목조회순위](./stock.go) (`GetRealtimeStockRank`)
-- [ ] `ka01300` - 관심종목 그룹 리스트 조회
-- [ ] `ka01301` - 관심종목 그룹 상세 조회
-- [x] `ka10001` - [주식기본정보요청](./stock.go) (`GetStockBasicInfo`)
-- [ ] `ka10002` - 주식거래원요청
-- [ ] `ka10003` - 체결정보요청
-- [ ] `ka10004` - 주식호가요청
-- [ ] `ka10005` - 주식일주월시분요청
-- [ ] `ka10006` - 주식시분요청
-- [ ] `ka10007` - 시세표성정보요청
-- [ ] `ka10010` - 업종프로그램요청
-- [ ] `ka10011` - 신주인수권전체시세요청
-- [ ] `ka10013` - 신용매매동향요청
-- [ ] `ka10014` - 공매도추이요청
-- [ ] `ka10015` - 일별거래상세요청
-- [ ] `ka10016` - 신고저가요청
-- [ ] `ka10017` - 상하한가요청
-- [ ] `ka10018` - 고저가근접요청
-- [ ] `ka10019` - 가격급등락요청
-- [ ] `ka10024` - 거래량갱신요청
-- [ ] `ka10025` - 매물대집중요청
-- [ ] `ka10026` - 고저PER요청
-- [ ] `ka10028` - 시가대비등락률요청
-- [ ] `ka10043` - 거래원매물대분석요청
-- [ ] `ka10044` - 일별기관매매종목요청
-- [ ] `ka10045` - 종목별기관매매추이요청
-- [ ] `ka10046` - 체결강도추이시간별요청
-- [ ] `ka10047` - 체결강도추이일별요청
-- [ ] `ka10048` - ELW일별민감도지표요청
-- [ ] `ka10050` - ELW민감도지표요청
-- [ ] `ka10051` - 업종별투자자순매수요청
-- [ ] `ka10052` - 거래원순간거래량요청
-- [ ] `ka10054` - 변동성완화장치발동종목요청
-- [ ] `ka10055` - 당일전일체결량요청
-- [ ] `ka10058` - 투자자별일별매매종목요청
-- [ ] `ka10059` - 종목별투자자기관별요청
-- [ ] `ka10061` - 종목별투자자기관별합계요청
-- [ ] `ka10063` - 장중투자자별매매요청
-- [ ] `ka10066` - 장마감후투자자별매매요청
-- [ ] `ka10078` - 증권사별종목매매동향요청
-- [ ] `ka10084` - 당일전일체결요청
-- [ ] `ka10086` - 일별주가요청
-- [ ] `ka10087` - 시간외단일가요청
-- [ ] `ka10095` - 지정종목 정보요청
-- [ ] `ka10099` - 종목정보 리스트
-- [ ] `ka10100` - 종목정보 조회
-- [ ] `ka10101` - 업종코드 리스트
-- [ ] `ka10102` - 회원사 리스트
-- [ ] `ka10103` - 종목메모 조회
-- [ ] `ka50100` - 금현물 시세정보
-- [ ] `ka50101` - 금현물 호가
-- [ ] `usa10098` - 미국주식 거래소구분 조회
-- [ ] `usa10099` - 미국주식 종목리스트
-- [ ] `usa10100` - 미국주식 종목 조회
-- [ ] `usa10101` - 미국주식 업종리스트
-- [ ] `usa10102` - 미국지수 리스트
-- [ ] `usa10103` - 미국주식 종목메모 조회
-- [ ] `usa10104` - 미국 ETF,ETN 리스트 
-- [ ] `usa10105` - 미국 ETF 카테고리 리스트
-- [ ] `usa20100` - 미국주식 현재가 종목정보
-- [ ] `usa20101` - 미국주식 현재가 10호가
-- [ ] `usa20150` - 미국주식 상세 체결내역
-- [ ] `usa20151` - 미국주식 일별 체결내역
-- [ ] `usa20200` - 미국주식 관심종목 그룹 리스트 조회
-- [ ] `usa20201` - 미국주식 관심종목 그룹 상세 조회
-- [ ] `usa20280` - 미국주식 조건검색 목록조회
-- [ ] `usa20281` - 미국주식 조건검색 요청 일반
-- [ ] `usa20290` - 미국주식 조건검색 요청 실시간
-- [ ] `usa20291` - 미국주식 조건검색 실시간 해제
-- [ ] `usa20520` - 미국주식 거래량급등락(주식/업종)
-- [ ] `usa20521` - 미국주식 거래량급등락(ETF)
-- [ ] `usa20570` - 미국주식 가격대별주가(주식/업종)
-- [ ] `usa20571` - 미국주식 가격대별주가(ETF)
-- [ ] `usa20590` - 미국주식 일별주가
-- [ ] `usa20930` - 미국주식 가격급등락(주식/업종)
-- [ ] `usa20931` - 미국주식 가격급등락(ETF)
-- [ ] `usa20932` - 미국주식 가격급등락(관심종목)
-- [ ] `usa20970` - 미국주식 고가/저가 접근(주식/업종)
-- [ ] `usa20971` - 미국주식 고가/저가 접근(ETF)
-- [ ] `usa20972` - 미국주식 고가/저가 접근(관심종목)
-- [ ] `usa23000` - 미국주식 업종별 기간별 수익률 조회
-- [ ] `usa23100` - 미국주식 업종별 등락률 상위/하위 조회
-- [ ] `usa23400` - 미국주식 거래량갱신(주식/업종)
-- [ ] `usa23401` - 미국주식 거래량갱신(ETF)
-- [ ] `usa23402` - 미국주식 거래량갱신(관심종목)
-- [ ] `usa24100` - 미국주식 신고가/신저가(주식/업종)
-- [ ] `usa24101` - 미국주식 신고가/신저가(ETF)
-- [ ] `usa24140` - 미국주식 갭상승/갭하락(주식/업종)
-- [ ] `usa24141` - 미국주식 갭상승/갭하락(ETF)
-- [ ] `usa24210` - 미국주식 잔량률급증(주식/업종)
-- [ ] `usa24211` - 미국주식 잔량률급증(ETF)
-- [ ] `usa24220` - 미국주식 매물대집중(주식/업종)
-- [ ] `usa24221` - 미국주식 매물대집중(ETF)
-- [ ] `usa24300` - 미국주식 리서치(미국주식/ETF)
-- [ ] `usa26410` - 미국주식 연도별 등락률(종목)
-- [ ] `usa26411` - 미국주식 연도별 업종별 종목등락률
-- [ ] `usa26412` - 미국주식 연도별 ETF 카테고리별 종목등락률
-- [ ] `usa26413` - 미국주식 연도별 등락률(업종)
-- [ ] `usa26414` - 미국주식 연도별 등락률(ETF)
-- [ ] `ust20000` - 미국주식 매수 주문
-- [ ] `ust20001` - 미국주식 매도 주문
-- [ ] `ust20002` - 미국주식 정정 주문
-- [ ] `ust20003` - 미국주식 취소 주문
-- [ ] `ust21200` - 미국주식 예약 매수주문
-- [ ] `ust21201` - 미국주식 예약 매도주문
-- [ ] `ust21203` - 미국주식 예약주문 취소
-- [ ] `ust21204` - 미국주식 일자별 예약내역 조회
-- [ ] `ust21205` - 미국주식 예약주문 내역조회
-- [ ] `ust31300` - 환전 예상 금액 조회
-- [ ] `ust31301` - 환율 조회
-- [ ] `ust31302` - 환전 신청
-- [ ] `ust31490` - 미국주식 주문가능수량(종목/증거금률별)
+- [x] `ka00190` - [대량체결상위](./api_registry_gen.go) (`GetBlockTradeRank`)
+- [x] `ka00196` - [체결금액대별매매비중](./api_registry_gen.go) (`GetTradeAmountRatio`)
+- [x] `ka01300` - [관심종목 그룹 리스트 조회](./api_registry_gen.go) (`GetWatchlistGroups`)
+- [x] `ka01301` - [관심종목 그룹 상세 조회](./api_registry_gen.go) (`GetWatchlistGroupDetail`)
+- [x] `ka10002` - [주식거래원요청](./api_registry_gen.go) (`GetStockBroker`)
+- [x] `ka10003` - [체결정보요청](./api_registry_gen.go) (`GetStockExecutionInfo`)
+- [x] `ka10004` - [주식호가요청](./api_registry_gen.go) (`GetStockQuote`)
+- [x] `ka10005` - [주식일주월시분요청](./api_registry_gen.go) (`GetStockDailyWeeklyMonthlyMinute`)
+- [x] `ka10006` - [주식시분요청](./api_registry_gen.go) (`GetStockIntradayMinute`)
+- [x] `ka10007` - [시세표성정보요청](./api_registry_gen.go) (`GetQuoteTableInfo`)
+- [x] `ka10010` - [업종프로그램요청](./api_registry_gen.go) (`GetSectorProgram`)
+- [x] `ka10011` - [신주인수권전체시세요청](./api_registry_gen.go) (`GetWarrantFullQuote`)
+- [x] `ka10013` - [신용매매동향요청](./api_registry_gen.go) (`GetCreditTradingTrend`)
+- [x] `ka10014` - [공매도추이요청](./api_registry_gen.go) (`GetShortSellingTrend`)
+- [x] `ka10015` - [일별거래상세요청](./api_registry_gen.go) (`GetDailyTradeDetail`)
+- [x] `ka10016` - [신고저가요청](./api_registry_gen.go) (`GetNewHighLow`)
+- [x] `ka10017` - [상하한가요청](./api_registry_gen.go) (`GetLimitUpDown`)
+- [x] `ka10018` - [고저가근접요청](./api_registry_gen.go) (`GetNearHighLow`)
+- [x] `ka10019` - [가격급등락요청](./api_registry_gen.go) (`GetPriceSurge`)
+- [x] `ka10061` - [종목별투자자기관별합계요청](./api_registry_gen.go) (`GetStockInvestorInstitutionTotal`)
+- [x] `ka10062` - [동일순매매순위요청](./api_registry_gen.go) (`GetSameNetBuyRank`)
+- [x] `ka10063` - [장중투자자별매매요청](./api_registry_gen.go) (`GetIntradayInvestorTrading`)
+- [x] `ka10065` - [장중투자자별매매상위요청](./api_registry_gen.go) (`GetIntradayInvestorTradingRank`)
+- [x] `ka10066` - [장마감후투자자별매매요청](./api_registry_gen.go) (`GetAfterCloseInvestorTrading`)
+- [x] `ka10068` - [대차거래추이요청](./api_registry_gen.go) (`GetSecuritiesLendingTrend`)
+- [x] `ka10069` - [대차거래상위10종목요청](./api_registry_gen.go) (`GetSecuritiesLendingTop10`)
+- [x] `ka10095` - [지정종목 정보요청](./api_registry_gen.go) (`GetDesignatedStockInfo`)
+- [x] `ka10098` - [시간외단일가등락율순위요청](./api_registry_gen.go) (`GetAfterHoursSinglePriceChangeRank`)
+- [x] `ka10099` - [종목정보 리스트](./api_registry_gen.go) (`GetStockInfoList`)
+- [x] `ka10100` - [종목정보 조회](./api_registry_gen.go) (`GetStockInfoLookup`)
+- [x] `ka10101` - [업종코드 리스트](./api_registry_gen.go) (`GetSectorCodeList`)
+- [x] `ka10102` - [회원사 리스트](./api_registry_gen.go) (`GetMemberFirmList`)
+- [x] `ka10103` - [종목메모 조회](./api_registry_gen.go) (`GetStockMemo`)
 
 ## 🏆 순위정보
-- [ ] `ka00190` - 대량체결상위
-- [ ] `ka00196` - 체결금액대별매매비중
-- [ ] `ka04196` - 수익률상위고객매매상세
-- [ ] `ka10020` - 호가잔량상위요청
-- [ ] `ka10021` - 호가잔량급증요청
-- [ ] `ka10022` - 잔량율급증요청
-- [x] `ka10023` - [거래량급증요청](./stock.go) (`GetVolumeSurge`)
-- [ ] `ka10027` - 전일대비등락률상위요청
-- [ ] `ka10029` - 예상체결등락률상위요청
-- [ ] `ka10030` - 당일거래량상위요청
-- [ ] `ka10031` - 전일거래량상위요청
-- [ ] `ka10032` - 거래대금상위요청
-- [ ] `ka10033` - 신용비율상위요청
-- [ ] `ka10034` - 외인기간별매매상위요청
-- [ ] `ka10035` - 외인연속순매매상위요청
-- [ ] `ka10036` - 외인한도소진율증가상위
-- [ ] `ka10037` - 외국계창구매매상위요청
-- [ ] `ka10038` - 종목별증권사순위요청
-- [ ] `ka10039` - 증권사별매매상위요청
-- [ ] `ka10040` - 당일주요거래원요청
-- [ ] `ka10042` - 순매수거래원순위요청
-- [ ] `ka10053` - 당일상위이탈원요청
-- [ ] `ka10062` - 동일순매매순위요청
-- [ ] `ka10065` - 장중투자자별매매상위요청
-- [ ] `ka10098` - 시간외단일가등락율순위요청
-- [ ] `usa01980` - 미국주식 실시간 종목 조회 순위
-- [ ] `usa01990` - 미국주식 관심종목 등록 상위
-- [ ] `usa20510` - 미국주식 기간별 등락률상위(주식/업종)
-- [ ] `usa20511` - 미국주식 기간별 등락률상위(ETF)
-- [ ] `usa20512` - 미국주식 기간별 등락률상위(관심종목)
-- [ ] `usa20530` - 미국주식 당일 거래량 상위(주식/업종)
-- [ ] `usa20531` - 미국주식 당일 거래량 상위(ETF)
-- [ ] `usa20540` - 미국주식 당일 거래대금 상위(주식/업종)
-- [ ] `usa20541` - 미국주식 당일 거래대금 상위(ETF)
-- [ ] `usa20550` - 미국주식 시가총액상위(주식/업종)
-- [ ] `usa20551` - 미국주식 시가총액상위(ETF)
-- [ ] `usa20880` - 키움 거래 상위 종목(미국주식)
-- [ ] `usa20881` - 키움 거래 상위 종목(미국 ETF)
-- [ ] `usa20910` - 미국주식 전일대비 등락률상위(주식/업종)
-- [ ] `usa20911` - 미국주식 전일대비 등락률상위(ETF)
-- [ ] `usa20920` - 미국주식 시가대비 등락률상위(주식/업종)
-- [ ] `usa20921` - 미국주식 시가대비 등락률상위(ETF)
-- [ ] `usa20922` - 미국주식 시가대비 등락률상위(관심종목)
-- [ ] `usa20940` - 미국주식 누적 등락률 상위(주식/업종)
-- [ ] `usa20941` - 미국주식 누적 등락률 상위(ETF)
-- [ ] `usa20960` - 미국주식 전일 거래상위(주식/업종)
-- [ ] `usa20961` - 미국주식 전일 거래상위(ETF)
-- [ ] `usa24110` - 미국주식 최고최저가대비 상승하락(주식/업종)
-- [ ] `usa24111` - 미국주식 최고최저가대비 상승하락(ETF)
-- [ ] `usa24120` - 미국주식 특정일자 상승/하락 (주식/업종)
-- [ ] `usa24121` - 미국주식 특정일자 상승/하락(ETF)
-- [ ] `usa24150` - 미국주식 회전율 상위(주식/업종)
-- [ ] `usa24151` - 미국주식 회전율 상위(ETF)
-- [ ] `usa24160` - 미국주식 연속상승/하락 순위(주식/업종)
-- [ ] `usa24161` - 미국주식 연속상승/하락 순위(ETF)
-- [ ] `usa24162` - 미국주식 연속상승/하락 순위(관심종목)
-- [ ] `usa24200` - 미국주식 호가잔량상위(주식/업종)
-- [ ] `usa24201` - 미국주식 호가잔량상위(ETF)
-- [ ] `usa24290` - 미국주식 주간거래 괴리율 상위(주식/업종)
-- [ ] `usa24291` - 미국주식 주간거래 괴리율 상위(ETF)
+- [x] `ka10020` - [호가잔량상위요청](./api_registry_gen.go) (`GetQuoteVolumeRank`)
+- [x] `ka10021` - [호가잔량급증요청](./api_registry_gen.go) (`GetQuoteVolumeSurge`)
+- [x] `ka10022` - [잔량율급증요청](./api_registry_gen.go) (`GetRemainingRateSurge`)
+- [x] `ka10024` - [거래량갱신요청](./api_registry_gen.go) (`GetVolumeRenewal`)
+- [x] `ka10025` - [매물대집중요청](./api_registry_gen.go) (`GetPriceCluster`)
+- [x] `ka10026` - [고저PER요청](./api_registry_gen.go) (`GetHighLowPER`)
+- [x] `ka10027` - [전일대비등락률상위요청](./api_registry_gen.go) (`GetPreviousDayChangeRateRank`)
+- [x] `ka10028` - [시가대비등락률요청](./api_registry_gen.go) (`GetOpenChangeRate`)
+- [x] `ka10029` - [예상체결등락률상위요청](./api_registry_gen.go) (`GetExpectedChangeRateRank`)
+- [x] `ka10030` - [당일거래량상위요청](./api_registry_gen.go) (`GetTodayVolumeRank`)
+- [x] `ka10031` - [전일거래량상위요청](./api_registry_gen.go) (`GetPreviousDayVolumeRank`)
+- [x] `ka10032` - [거래대금상위요청](./api_registry_gen.go) (`GetTradingValueRank`)
+- [x] `ka10033` - [신용비율상위요청](./api_registry_gen.go) (`GetCreditRatioRank`)
+- [x] `ka10034` - [외인기간별매매상위요청](./api_registry_gen.go) (`GetForeignerPeriodTradingRank`)
+- [x] `ka10035` - [외인연속순매매상위요청](./api_registry_gen.go) (`GetForeignerConsecutiveNetBuyRank`)
+- [x] `ka10036` - [외인한도소진율증가상위](./api_registry_gen.go) (`GetForeignerLimitExhaustionRank`)
+- [x] `ka10037` - [외국계창구매매상위요청](./api_registry_gen.go) (`GetForeignBrokerTradingRank`)
+- [x] `ka10038` - [종목별증권사순위요청](./api_registry_gen.go) (`GetStockSecuritiesFirmRank`)
+- [x] `ka10039` - [증권사별매매상위요청](./api_registry_gen.go) (`GetSecuritiesFirmTradingRank`)
+- [x] `ka10040` - [당일주요거래원요청](./api_registry_gen.go) (`GetTodayMainBrokers`)
+- [x] `ka10042` - [순매수거래원순위요청](./api_registry_gen.go) (`GetNetBuyBrokerRank`)
+- [x] `ka10043` - [거래원매물대분석요청](./api_registry_gen.go) (`GetBrokerPriceClusterAnalysis`)
+- [x] `ka10044` - [일별기관매매종목요청](./api_registry_gen.go) (`GetDailyInstitutionTradingStocks`)
+- [x] `ka10045` - [종목별기관매매추이요청](./api_registry_gen.go) (`GetStockInstitutionTradingTrend`)
+- [x] `ka10046` - [체결강도추이시간별요청](./api_registry_gen.go) (`GetExecutionStrengthIntraday`)
+- [x] `ka10047` - [체결강도추이일별요청](./api_registry_gen.go) (`GetExecutionStrengthDaily`)
+- [x] `ka10048` - [ELW일별민감도지표요청](./api_registry_gen.go) (`GetELWDailySensitivity`)
+- [x] `ka10050` - [ELW민감도지표요청](./api_registry_gen.go) (`GetELWSensitivity`)
+- [x] `ka10051` - [업종별투자자순매수요청](./api_registry_gen.go) (`GetSectorInvestorNetBuy`)
+- [x] `ka10052` - [거래원순간거래량요청](./api_registry_gen.go) (`GetBrokerInstantVolume`)
+- [x] `ka10053` - [당일상위이탈원요청](./api_registry_gen.go) (`GetTodayTopExitBroker`)
+- [x] `ka10054` - [변동성완화장치발동종목요청](./api_registry_gen.go) (`GetVITriggeredStocks`)
+- [x] `ka10055` - [당일전일체결량요청](./api_registry_gen.go) (`GetTodayPreviousVolume`)
+- [x] `ka10058` - [투자자별일별매매종목요청](./api_registry_gen.go) (`GetInvestorDailyTradingStocks`)
+- [x] `ka10059` - [종목별투자자기관별요청](./api_registry_gen.go) (`GetStockInvestorInstitution`)
 
 ## 🌐 기관/외국인
 - [x] `ka10008` - [주식외국인종목별매매동향](./fundamental.go) (`GetStockForeignInvestor`)
-- [ ] `ka10131` - 기관외국인연속매매현황요청
-
-## 📊 업종
-- [ ] `ka20001` - 업종현재가요청
-- [ ] `ka20002` - 업종별주가요청
-- [ ] `ka20003` - 전업종지수요청
-- [ ] `ka20004` - 업종틱차트조회요청
-- [ ] `ka20005` - 업종분봉조회요청
-- [ ] `ka20006` - 업종일봉조회요청
-- [ ] `ka20007` - 업종주봉조회요청
-- [ ] `ka20008` - 업종월봉조회요청
-- [ ] `ka20009` - 업종현재가일별요청
-- [ ] `ka20019` - 업종년봉조회요청
-- [ ] `ka20068` - 대차거래추이요청(종목별)
 
 ## 📉 차트
-- [ ] `ka10060` - 종목별투자자기관별차트요청
-- [ ] `ka10064` - 장중투자자별매매차트요청
-- [x] `ka10079` - [주식틱차트조회요청](./chart.go) (`GetStockTickChart`)
-- [x] `ka10080` - [주식분봉차트조회요청](./chart.go) (`GetStockMinuteChart`)
-- [x] `ka10081` - [주식일봉차트조회요청](./chart.go) (`GetStockDailyChart`)
-- [x] `ka10082` - [주식주봉차트조회요청](./chart.go) (`GetStockWeeklyChart`)
-- [x] `ka10083` - [주식월봉차트조회요청](./chart.go) (`GetStockMonthlyChart`)
-- [x] `ka10094` - [주식년봉차트조회요청](./chart.go) (`GetStockYearlyChart`)
-- [ ] `usa06010` - 미국주식 틱 차트
-- [ ] `usa06011` - 미국주식 분 차트
-- [ ] `usa06012` - 미국주식 일 차트
-- [ ] `usa06013` - 미국주식 주 차트
-- [ ] `usa06014` - 미국주식 월 차트
-- [ ] `usa06015` - 미국주식 년 차트
-- [ ] `usa06016` - 미국주식 분기 차트
+- [x] `ka10060` - [종목별투자자기관별차트요청](./api_registry_gen.go) (`GetStockInvestorInstitutionChart`)
+- [x] `ka10064` - [장중투자자별매매차트요청](./api_registry_gen.go) (`GetIntradayInvestorTradingChart`)
 
 ## 📑 조건검색
-- [ ] `ka10170` - 당일매매일지요청
-- [ ] `ka10171` - 조건검색 목록조회
-- [ ] `ka10172` - 조건검색 요청 일반
-- [ ] `ka10173` - 조건검색 요청 실시간
-- [ ] `ka10174` - 조건검색 실시간 해제
+- [x] `ka10170` - [당일매매일지요청](./api_registry_gen.go) (`GetTodayTradingJournal`)
+- [x] `ka10171` - [조건검색 목록조회](./api_registry_gen.go) (`GetConditionSearchList`)
+- [x] `ka10172` - [조건검색 요청 일반](./api_registry_gen.go) (`GetConditionSearch`)
+- [x] `ka10173` - [조건검색 요청 실시간](./api_registry_gen.go) (`GetConditionSearchRealtime`)
+- [x] `ka10174` - [조건검색 실시간 해제](./api_registry_gen.go) (`ReleaseConditionSearchRealtime`)
 
 ## 📥 주문
 - [x] `kt10000` - [주식 매수주문](./order.go) (`OrderBuy`)
@@ -297,88 +169,107 @@ Official API reference: [`_ref/kiwoom-rest-api-spec.json`](./_ref/kiwoom-rest-ap
 - [x] `kt10008` - [신용 정정주문](./order.go) (`CreditOrderModify`)
 - [x] `kt10009` - [신용 취소주문](./order.go) (`CreditOrderCancel`)
 
-## 🥇 금현물
-- [ ] `ka50010` - 금현물체결추이
-- [ ] `ka50012` - 금현물일별추이
-- [ ] `ka50087` - 금현물예상체결
-- [ ] `ka52301` - 금현물투자자현황
-- [ ] `kt50000` - 금현물 매수주문
-- [ ] `kt50001` - 금현물 매도주문
-- [ ] `kt50002` - 금현물 정정주문
-- [ ] `kt50003` - 금현물 취소주문
-- [ ] `kt50020` - 금현물 잔고확인
-- [ ] `kt50021` - 금현물 예수금
-- [ ] `kt50030` - 금현물 주문체결전체조회
-- [ ] `kt50031` - 금현물 주문체결조회
-- [ ] `kt50032` - 금현물 거래내역조회
-- [ ] `kt50075` - 금현물 미체결조회
+## 🏷 ETF
+- [x] `ka40001` - [ETF수익율요청](./api_registry_gen.go) (`GetETFReturnRate`)
+- [x] `ka40002` - [ETF종목정보요청](./api_registry_gen.go) (`GetETFStockInfo`)
+- [x] `ka40003` - [ETF일별추이요청](./api_registry_gen.go) (`GetETFDailyTrend`)
+- [x] `ka40004` - [ETF전체시세요청](./api_registry_gen.go) (`GetETFFullQuote`)
+- [x] `ka40006` - [ETF시간대별추이요청](./api_registry_gen.go) (`GetETFIntradayTrend`)
+- [x] `ka40007` - [ETF시간대별체결요청](./api_registry_gen.go) (`GetETFIntradayExecutions`)
+- [x] `ka40008` - [ETF일자별체결요청](./api_registry_gen.go) (`GetETFDailyExecutions`)
+- [x] `ka40009` - [ETF시간대별NAV현황](./api_registry_gen.go) (`GetETFIntradayNAV`)
+- [x] `ka40010` - [ETF시간대별수급현황](./api_registry_gen.go) (`GetETFIntradaySupplyDemand`)
 
-## 📈 금현물 차트
-- [ ] `ka50079` - 금현물틱차트조회요청
-- [ ] `ka50080` - 금현물분봉차트조회요청
-- [ ] `ka50081` - 금현물일봉차트조회요청
-- [ ] `ka50082` - 금현물주봉차트조회요청
-- [ ] `ka50083` - 금현물월봉차트조회요청
-- [ ] `ka50091` - 금현물당일틱차트조회요청
-- [ ] `ka50092` - 금현물당일분봉차트조회요청
+## 🇺🇸 미국주식/ETF
+- [x] `usa01980` - [미국주식 실시간 종목 조회 순위](./api_registry_gen.go) (`GetUSStockRealtimeViewRank`)
+- [x] `usa01990` - [미국주식 관심종목 등록 상위](./api_registry_gen.go) (`GetUSStockWatchlistRegistrationTop`)
+- [x] `usa06010` - [미국주식 틱 차트](./api_registry_gen.go) (`GetUSStockTickChart`)
+- [x] `usa06011` - [미국주식 분 차트](./api_registry_gen.go) (`GetUSStockMinuteChart`)
+- [x] `usa06012` - [미국주식 일 차트](./api_registry_gen.go) (`GetUSStockDailyChart`)
+- [x] `usa06013` - [미국주식 주 차트](./api_registry_gen.go) (`GetUSStockWeeklyChart`)
+- [x] `usa06014` - [미국주식 월 차트](./api_registry_gen.go) (`GetUSStockMonthlyChart`)
+- [x] `usa06015` - [미국주식 년 차트](./api_registry_gen.go) (`GetUSStockYearlyChart`)
+- [x] `usa06016` - [미국주식 분기 차트](./api_registry_gen.go) (`GetUSStockQuarterlyChart`)
+- [x] `usa10098` - [미국주식 거래소구분 조회](./api_registry_gen.go) (`GetUSStockExchangeTypes`)
+- [x] `usa10099` - [미국주식 종목리스트](./api_registry_gen.go) (`GetUSStockList`)
+- [x] `usa10100` - [미국주식 종목 조회](./api_registry_gen.go) (`GetUSStockLookup`)
+- [x] `usa10101` - [미국주식 업종리스트](./api_registry_gen.go) (`GetUSStockSectorList`)
+- [x] `usa10102` - [미국지수 리스트](./api_registry_gen.go) (`GetUSIndexList`)
+- [x] `usa10103` - [미국주식 종목메모 조회](./api_registry_gen.go) (`GetUSStockMemo`)
+- [x] `usa10104` - [미국 ETF,ETN 리스트 ](./api_registry_gen.go) (`GetUSETFETNList`)
+- [x] `usa10105` - [미국 ETF 카테고리 리스트](./api_registry_gen.go) (`GetUSETFCategoryList`)
+- [x] `usa20100` - [미국주식 현재가 종목정보](./api_registry_gen.go) (`GetUSStockCurrentInfo`)
+- [x] `usa20101` - [미국주식 현재가 10호가](./api_registry_gen.go) (`GetUSStockQuote10`)
+- [x] `usa20150` - [미국주식 상세 체결내역](./api_registry_gen.go) (`GetUSStockDetailedExecutions`)
+- [x] `usa20151` - [미국주식 일별 체결내역](./api_registry_gen.go) (`GetUSStockDailyExecutions`)
+- [x] `usa20200` - [미국주식 관심종목 그룹 리스트 조회](./api_registry_gen.go) (`GetUSStockWatchlistGroups`)
+- [x] `usa20201` - [미국주식 관심종목 그룹 상세 조회](./api_registry_gen.go) (`GetUSStockWatchlistGroupDetail`)
+- [x] `usa20280` - [미국주식 조건검색 목록조회](./api_registry_gen.go) (`GetUSStockConditionSearchList`)
+- [x] `usa20281` - [미국주식 조건검색 요청 일반](./api_registry_gen.go) (`GetUSStockConditionSearch`)
+- [x] `usa20290` - [미국주식 조건검색 요청 실시간](./api_registry_gen.go) (`GetUSStockConditionSearchRealtime`)
+- [x] `usa20291` - [미국주식 조건검색 실시간 해제](./api_registry_gen.go) (`ReleaseUSStockConditionSearchRealtime`)
+- [x] `usa20510` - [미국주식 기간별 등락률상위(주식/업종)](./api_registry_gen.go) (`GetUSStockPeriodChangeRateRank`)
+- [x] `usa20511` - [미국주식 기간별 등락률상위(ETF)](./api_registry_gen.go) (`GetUSETFPeriodChangeRateRank`)
+- [x] `usa20512` - [미국주식 기간별 등락률상위(관심종목)](./api_registry_gen.go) (`GetUSWatchlistPeriodChangeRateRank`)
+- [x] `usa20520` - [미국주식 거래량급등락(주식/업종)](./api_registry_gen.go) (`GetUSStockVolumeSurge`)
+- [x] `usa20521` - [미국주식 거래량급등락(ETF)](./api_registry_gen.go) (`GetUSETFVolumeSurge`)
+- [x] `usa20530` - [미국주식 당일 거래량 상위(주식/업종)](./api_registry_gen.go) (`GetUSStockTodayVolumeRank`)
+- [x] `usa20531` - [미국주식 당일 거래량 상위(ETF)](./api_registry_gen.go) (`GetUSETFTodayVolumeRank`)
+- [x] `usa20540` - [미국주식 당일 거래대금 상위(주식/업종)](./api_registry_gen.go) (`GetUSStockTodayTradingValueRank`)
+- [x] `usa20541` - [미국주식 당일 거래대금 상위(ETF)](./api_registry_gen.go) (`GetUSETFTodayTradingValueRank`)
+- [x] `usa20550` - [미국주식 시가총액상위(주식/업종)](./api_registry_gen.go) (`GetUSStockMarketCapRank`)
+- [x] `usa20551` - [미국주식 시가총액상위(ETF)](./api_registry_gen.go) (`GetUSETFMarketCapRank`)
+- [x] `usa20570` - [미국주식 가격대별주가(주식/업종)](./api_registry_gen.go) (`GetUSStockPriceRange`)
+- [x] `usa20571` - [미국주식 가격대별주가(ETF)](./api_registry_gen.go) (`GetUSETFPriceRange`)
+- [x] `usa20590` - [미국주식 일별주가](./api_registry_gen.go) (`GetUSStockDailyPrice`)
+- [x] `usa20880` - [키움 거래 상위 종목(미국주식)](./api_registry_gen.go) (`GetKiwoomTopTradedUSStocks`)
+- [x] `usa20881` - [키움 거래 상위 종목(미국 ETF)](./api_registry_gen.go) (`GetKiwoomTopTradedUSETFs`)
+- [x] `usa20910` - [미국주식 전일대비 등락률상위(주식/업종)](./api_registry_gen.go) (`GetUSStockPreviousDayChangeRateRank`)
+- [x] `usa20911` - [미국주식 전일대비 등락률상위(ETF)](./api_registry_gen.go) (`GetUSETFPreviousDayChangeRateRank`)
+- [x] `usa20920` - [미국주식 시가대비 등락률상위(주식/업종)](./api_registry_gen.go) (`GetUSStockOpenChangeRateRank`)
+- [x] `usa20921` - [미국주식 시가대비 등락률상위(ETF)](./api_registry_gen.go) (`GetUSETFOpenChangeRateRank`)
+- [x] `usa20922` - [미국주식 시가대비 등락률상위(관심종목)](./api_registry_gen.go) (`GetUSWatchlistOpenChangeRateRank`)
+- [x] `usa20930` - [미국주식 가격급등락(주식/업종)](./api_registry_gen.go) (`GetUSStockPriceSurge`)
+- [x] `usa20931` - [미국주식 가격급등락(ETF)](./api_registry_gen.go) (`GetUSETFPriceSurge`)
+- [x] `usa20932` - [미국주식 가격급등락(관심종목)](./api_registry_gen.go) (`GetUSWatchlistPriceSurge`)
+- [x] `usa20940` - [미국주식 누적 등락률 상위(주식/업종)](./api_registry_gen.go) (`GetUSStockCumulativeChangeRateRank`)
+- [x] `usa20941` - [미국주식 누적 등락률 상위(ETF)](./api_registry_gen.go) (`GetUSETFCumulativeChangeRateRank`)
+- [x] `usa20960` - [미국주식 전일 거래상위(주식/업종)](./api_registry_gen.go) (`GetUSStockPreviousDayTradingRank`)
+- [x] `usa20961` - [미국주식 전일 거래상위(ETF)](./api_registry_gen.go) (`GetUSETFPreviousDayTradingRank`)
+- [x] `usa20970` - [미국주식 고가/저가 접근(주식/업종)](./api_registry_gen.go) (`GetUSStockNearHighLow`)
+- [x] `usa20971` - [미국주식 고가/저가 접근(ETF)](./api_registry_gen.go) (`GetUSETFNearHighLow`)
+- [x] `usa20972` - [미국주식 고가/저가 접근(관심종목)](./api_registry_gen.go) (`GetUSWatchlistNearHighLow`)
+- [x] `usa23000` - [미국주식 업종별 기간별 수익률 조회](./api_registry_gen.go) (`GetUSStockSectorPeriodReturn`)
+- [x] `usa23100` - [미국주식 업종별 등락률 상위/하위 조회](./api_registry_gen.go) (`GetUSStockSectorChangeRateRank`)
+- [x] `usa23400` - [미국주식 거래량갱신(주식/업종)](./api_registry_gen.go) (`GetUSStockVolumeRenewal`)
+- [x] `usa23401` - [미국주식 거래량갱신(ETF)](./api_registry_gen.go) (`GetUSETFVolumeRenewal`)
+- [x] `usa23402` - [미국주식 거래량갱신(관심종목)](./api_registry_gen.go) (`GetUSWatchlistVolumeRenewal`)
+- [x] `usa24100` - [미국주식 신고가/신저가(주식/업종)](./api_registry_gen.go) (`GetUSStockNewHighLow`)
+- [x] `usa24101` - [미국주식 신고가/신저가(ETF)](./api_registry_gen.go) (`GetUSETFNewHighLow`)
+- [x] `usa24110` - [미국주식 최고최저가대비 상승하락(주식/업종)](./api_registry_gen.go) (`GetUSStockFromExtremePriceChange`)
+- [x] `usa24111` - [미국주식 최고최저가대비 상승하락(ETF)](./api_registry_gen.go) (`GetUSETFFromExtremePriceChange`)
+- [x] `usa24120` - [미국주식 특정일자 상승/하락 (주식/업종)](./api_registry_gen.go) (`GetUSStockSpecificDateChange`)
+- [x] `usa24121` - [미국주식 특정일자 상승/하락(ETF)](./api_registry_gen.go) (`GetUSETFSpecificDateChange`)
+- [x] `usa24140` - [미국주식 갭상승/갭하락(주식/업종)](./api_registry_gen.go) (`GetUSStockGapUpDown`)
+- [x] `usa24141` - [미국주식 갭상승/갭하락(ETF)](./api_registry_gen.go) (`GetUSETFGapUpDown`)
+- [x] `usa24150` - [미국주식 회전율 상위(주식/업종)](./api_registry_gen.go) (`GetUSStockTurnoverRank`)
+- [x] `usa24151` - [미국주식 회전율 상위(ETF)](./api_registry_gen.go) (`GetUSETFTurnoverRank`)
+- [x] `usa24160` - [미국주식 연속상승/하락 순위(주식/업종)](./api_registry_gen.go) (`GetUSStockConsecutiveChangeRank`)
+- [x] `usa24161` - [미국주식 연속상승/하락 순위(ETF)](./api_registry_gen.go) (`GetUSETFConsecutiveChangeRank`)
+- [x] `usa24162` - [미국주식 연속상승/하락 순위(관심종목)](./api_registry_gen.go) (`GetUSWatchlistConsecutiveChangeRank`)
+- [x] `usa24200` - [미국주식 호가잔량상위(주식/업종)](./api_registry_gen.go) (`GetUSStockQuoteVolumeRank`)
+- [x] `usa24201` - [미국주식 호가잔량상위(ETF)](./api_registry_gen.go) (`GetUSETFQuoteVolumeRank`)
+- [x] `usa24210` - [미국주식 잔량률급증(주식/업종)](./api_registry_gen.go) (`GetUSStockRemainingRateSurge`)
+- [x] `usa24211` - [미국주식 잔량률급증(ETF)](./api_registry_gen.go) (`GetUSETFRemainingRateSurge`)
+- [x] `usa24220` - [미국주식 매물대집중(주식/업종)](./api_registry_gen.go) (`GetUSStockPriceCluster`)
+- [x] `usa24221` - [미국주식 매물대집중(ETF)](./api_registry_gen.go) (`GetUSETFPriceCluster`)
+- [x] `usa24290` - [미국주식 주간거래 괴리율 상위(주식/업종)](./api_registry_gen.go) (`GetUSStockWeeklyDeviationRank`)
+- [x] `usa24291` - [미국주식 주간거래 괴리율 상위(ETF)](./api_registry_gen.go) (`GetUSETFWeeklyDeviationRank`)
+- [x] `usa24300` - [미국주식 리서치(미국주식/ETF)](./api_registry_gen.go) (`GetUSStockResearch`)
+- [x] `usa26410` - [미국주식 연도별 등락률(종목)](./api_registry_gen.go) (`GetUSStockYearlyChangeRate`)
+- [x] `usa26411` - [미국주식 연도별 업종별 종목등락률](./api_registry_gen.go) (`GetUSStockYearlySectorChangeRate`)
+- [x] `usa26412` - [미국주식 연도별 ETF 카테고리별 종목등락률](./api_registry_gen.go) (`GetUSETFYearlyCategoryChangeRate`)
+- [x] `usa26413` - [미국주식 연도별 등락률(업종)](./api_registry_gen.go) (`GetUSStockYearlySectorReturn`)
+- [x] `usa26414` - [미국주식 연도별 등락률(ETF)](./api_registry_gen.go) (`GetUSETFYearlyChangeRate`)
+- [x] `ust31490` - [미국주식 주문가능수량(종목/증거금률별)](./api_registry_gen.go) (`GetUSOrderableQuantity`)
 
-## 🏷 ELW/ETF
-- [ ] `ka30001` - ELW가격급등락요청
-- [ ] `ka30002` - 거래원별ELW순매매상위요청
-- [ ] `ka30003` - ELWLP보유일별추이요청
-- [ ] `ka30004` - ELW괴리율요청
-- [ ] `ka30005` - ELW조건검색요청
-- [ ] `ka30009` - ELW등락율순위요청
-- [ ] `ka30010` - ELW잔량순위요청
-- [ ] `ka30011` - ELW근접율요청
-- [ ] `ka30012` - ELW종목상세정보요청
-- [ ] `ka40001` - ETF수익율요청
-- [ ] `ka40002` - ETF종목정보요청
-- [ ] `ka40003` - ETF일별추이요청
-- [ ] `ka40004` - ETF전체시세요청
-- [ ] `ka40006` - ETF시간대별추이요청
-- [ ] `ka40007` - ETF시간대별체결요청
-- [ ] `ka40008` - ETF일자별체결요청
-- [ ] `ka40009` - ETF시간대별NAV현황
-- [ ] `ka40010` - ETF시간대별수급현황
-
-## 🏢 대차거래/테마/프로그램
-- [ ] `ka10068` - 대차거래추이요청
-- [ ] `ka10069` - 대차거래상위10종목요청
-- [ ] `ka90001` - 테마그룹별요청
-- [ ] `ka90002` - 테마구성종목요청
-- [ ] `ka90003` - 프로그램순매수상위50요청
-- [ ] `ka90004` - 종목별프로그램매매현황요청
-- [ ] `ka90005` - 프로그램매매추이요청 시간대별
-- [ ] `ka90006` - 프로그램매매차익잔고추이요청
-- [ ] `ka90007` - 프로그램매매누적추이요청
-- [ ] `ka90008` - 종목시간별프로그램매매추이요청
-- [ ] `ka90009` - 외국인기관매매상위요청
-- [ ] `ka90010` - 프로그램매매추이요청 일자별
-- [ ] `ka90012` - 대차거래내역요청
-- [ ] `ka90013` - 종목일별프로그램매매추이요청
-
-## 🕒 실시간 FID
-- [ ] `00` - 주문체결
-- [ ] `04` - 잔고
-- [ ] `0A` - 주식기세
-- [ ] `0B` - 주식체결
-- [ ] `0C` - 주식우선호가
-- [ ] `0D` - 주식호가잔량
-- [ ] `0E` - 주식시간외호가
-- [ ] `0F` - 주식당일거래원
-- [ ] `0G` - ETF NAV
-- [ ] `0H` - 주식예상체결
-- [ ] `0I` - 국제금환산가격
-- [ ] `0J` - 업종지수
-- [ ] `0U` - 업종등락
-- [ ] `0g` - 주식종목정보
-- [ ] `0m` - ELW 이론가
-- [ ] `0s` - 장시작시간
-- [ ] `0u` - ELW 지표
-- [ ] `0w` - 종목프로그램매매
-- [ ] `1h` - VI발동/해제
-- [ ] `F4` - 미국주식 실시간 주문 확인
-- [ ] `F5` - 미국주식 실시간 체결
-- [ ] `FE` - 미국주식 실시간 체결가
-- [ ] `FT` - 미국주식 10호가

@@ -55,6 +55,21 @@ var catalog = map[string]map[string]commandFunc{
 		"modify": cmdOrderModify,
 		"cancel": cmdOrderCancel,
 	},
+	"us-order": {
+		"buy":    cmdUSOrderBuy,
+		"sell":   cmdUSOrderSell,
+		"modify": cmdUSOrderModify,
+		"cancel": cmdUSOrderCancel,
+	},
+	"us-account": {
+		"open-orders": cmdUSAccountOpenOrders,
+		"balance":     cmdUSAccountBalance,
+		"deposit":     cmdUSAccountDeposit,
+	},
+	"api": {
+		"list": cmdAPIList,
+		"call": cmdAPICall,
+	},
 }
 
 func run(args []string, stdout io.Writer, stderr io.Writer, getenv envGetter) int {
@@ -153,7 +168,10 @@ examples:
   kioom --mock auth issue
   kioom --mock --token "$KIOOM_TOKEN" account number
   kioom --mock stock basic --json '{"stk_cd":"005930"}'
+  kioom --mock api list --filter ka10002
+  kioom --mock api call ka10002 --json '{"stk_cd":"005930"}'
   kioom schema stock.basic
+  kioom schema api.ka10002
 `)
 }
 
@@ -419,6 +437,104 @@ func cmdOrderCancel(c *kioom.Client, output string, args []string, w io.Writer) 
 		return err
 	}
 	res, err := c.OrderCancel(context.Background(), &req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdUSOrderBuy(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.USOrderBuyRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateUSOrderBuyRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.USOrderBuy(context.Background(), &req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdUSOrderSell(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.USOrderSellRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateUSOrderSellRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.USOrderSell(context.Background(), &req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdUSOrderModify(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.USOrderModifyRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateUSOrderModifyRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.USOrderModify(context.Background(), &req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdUSOrderCancel(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.USOrderCancelRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateUSOrderCancelRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.USOrderCancel(context.Background(), &req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdUSAccountOpenOrders(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.USOpenOrdersRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateUSOpenOrdersRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.GetUSOpenOrders(context.Background(), &req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdUSAccountBalance(c *kioom.Client, output string, args []string, w io.Writer) error {
+	var req kioom.USAccountBalanceRequest
+	if err := parseJSONArg(args, &req); err != nil {
+		return err
+	}
+	if err := kioomvalidate.ValidateUSAccountBalanceRequest(&req); err != nil {
+		return err
+	}
+	res, err := c.GetUSAccountBalance(context.Background(), &req)
+	if err != nil {
+		return err
+	}
+	return writeOK(w, output, res)
+}
+
+func cmdUSAccountDeposit(c *kioom.Client, output string, _ []string, w io.Writer) error {
+	res, err := c.GetUSDeposit(context.Background())
 	if err != nil {
 		return err
 	}

@@ -39,4 +39,15 @@ const (
 	API_CreditOrderSell = "kt10007"
 	API_CreditModify    = "kt10008"
 	API_CreditCancel    = "kt10009"
+
+	// US Stock/ETF Orders
+	API_USOrderBuy    = "ust20000"
+	API_USOrderSell   = "ust20001"
+	API_USOrderModify = "ust20002"
+	API_USOrderCancel = "ust20003"
+
+	// US Stock/ETF Account
+	API_USOpenOrders     = "ust21050"
+	API_USAccountBalance = "ust21070"
+	API_USDeposit        = "ust21110"
 )

@@ -194,8 +194,15 @@ docker run -d \
 | `stock_weekly_chart` | 주봉 차트 조회 (`kioom.StockChartRequest`) |
 | `stock_monthly_chart` | 월봉 차트 조회 (`kioom.StockChartRequest`) |
 | `stock_yearly_chart` | 년봉 차트 조회 (`kioom.StockChartRequest`) |
-| `order_buy` / `order_sell` | 매수·매도 주문 |
-| `order_modify` / `order_cancel` | 정정·취소 |
+| `order_buy` / `order_sell` | 국내 매수·매도 주문 |
+| `order_modify` / `order_cancel` | 국내 정정·취소 |
+| `us_order_buy` / `us_order_sell` | 미국주식·ETF 매수·매도 |
+| `us_order_modify` / `us_order_cancel` | 미국주식·ETF 정정·취소 |
+| `us_account_open_orders` | 미국주식 미체결 조회 |
+| `us_account_balance` | 미국주식 잔고 조회 |
+| `us_account_deposit` | 해외주식 예수금 조회 |
+| `api_list` | 생성된 주식/ETF/미국 TR 코드 목록 (`filter` 선택) |
+| `api_call` | TR 코드(`api_id`)와 JSON `request`로 생성 API 호출 |
 
 요청 필드 검증은 CLI와 공유하는 `internal/kioomvalidate`를 씁니다.
 

@@ -5,6 +5,9 @@ package mcpkioom
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"strings"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	kioom "github.com/suapapa/go_kioom"
@@ -34,7 +37,7 @@ func NewServer(client *kioom.Client, impl *mcp.Implementation, opts *mcp.ServerO
 }
 
 func serverInstructions() string {
-	return `Kiwoom Open API MCP server. Requires KIOOM_APP_KEY and KIOOM_SECRET_KEY environment variables (and optionally KIOOM_TOKEN, KIOOM_MOCK=true for testing). Provides tools for authentication (auth_*), account management (account_*), stock querying (stock_*), and trading/ordering (order_*).`
+	return `Kiwoom Open API MCP server. Requires KIOOM_APP_KEY and KIOOM_SECRET_KEY environment variables (and optionally KIOOM_TOKEN, KIOOM_MOCK=true for testing). Provides tools for authentication (auth_*), account management (account_*), stock querying (stock_*), domestic trading (order_*), US stock/ETF trading (us_order_*), and US account queries (us_account_*).`
 }
 
 func addTools(s *mcp.Server, c *kioom.Client) {
@@ -242,5 +245,122 @@ func addTools(s *mcp.Server, c *kioom.Client) {
 		}
 		res, err := c.OrderCancel(ctx, &in)
 		return nil, res, err
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "us_order_buy",
+		Description: "Place a US stock/ETF buy order; body matches kioom.USOrderBuyRequest.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in kioom.USOrderBuyRequest) (*mcp.CallToolResult, *kioom.USOrderBuyResponse, error) {
+		if err := kioomvalidate.ValidateUSOrderBuyRequest(&in); err != nil {
+			return nil, nil, err
+		}
+		res, err := c.USOrderBuy(ctx, &in)
+		return nil, res, err
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "us_order_sell",
+		Description: "Place a US stock/ETF sell order; body matches kioom.USOrderSellRequest.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in kioom.USOrderSellRequest) (*mcp.CallToolResult, *kioom.USOrderSellResponse, error) {
+		if err := kioomvalidate.ValidateUSOrderSellRequest(&in); err != nil {
+			return nil, nil, err
+		}
+		res, err := c.USOrderSell(ctx, &in)
+		return nil, res, err
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "us_order_modify",
+		Description: "Modify a US stock/ETF order; body matches kioom.USOrderModifyRequest.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in kioom.USOrderModifyRequest) (*mcp.CallToolResult, *kioom.USOrderModifyResponse, error) {
+		if err := kioomvalidate.ValidateUSOrderModifyRequest(&in); err != nil {
+			return nil, nil, err
+		}
+		res, err := c.USOrderModify(ctx, &in)
+		return nil, res, err
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "us_order_cancel",
+		Description: "Cancel a US stock/ETF order; body matches kioom.USOrderCancelRequest.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in kioom.USOrderCancelRequest) (*mcp.CallToolResult, *kioom.USOrderCancelResponse, error) {
+		if err := kioomvalidate.ValidateUSOrderCancelRequest(&in); err != nil {
+			return nil, nil, err
+		}
+		res, err := c.USOrderCancel(ctx, &in)
+		return nil, res, err
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "us_account_open_orders",
+		Description: "Query US stock/ETF open orders; body matches kioom.USOpenOrdersRequest.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in kioom.USOpenOrdersRequest) (*mcp.CallToolResult, *kioom.USOpenOrdersResponse, error) {
+		if err := kioomvalidate.ValidateUSOpenOrdersRequest(&in); err != nil {
+			return nil, nil, err
+		}
+		res, err := c.GetUSOpenOrders(ctx, &in)
+		return nil, res, err
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "us_account_balance",
+		Description: "Query US stock/ETF holdings; body matches kioom.USAccountBalanceRequest.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in kioom.USAccountBalanceRequest) (*mcp.CallToolResult, *kioom.USAccountBalanceResponse, error) {
+		if err := kioomvalidate.ValidateUSAccountBalanceRequest(&in); err != nil {
+			return nil, nil, err
+		}
+		res, err := c.GetUSAccountBalance(ctx, &in)
+		return nil, res, err
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "us_account_deposit",
+		Description: "Query overseas stock deposit balances by currency (ust21110).",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, _ noArgs) (*mcp.CallToolResult, *kioom.USDepositResponse, error) {
+		res, err := c.GetUSDeposit(ctx)
+		return nil, res, err
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "api_list",
+		Description: "List generated stock/ETF/US Kiwoom TR codes with metadata. Optional filter substring.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in struct {
+		Filter string `json:"filter"`
+	}) (*mcp.CallToolResult, map[string]any, error) {
+		items := make([]map[string]string, 0, len(kioom.GeneratedAPIRegistry))
+		filter := strings.ToLower(strings.TrimSpace(in.Filter))
+		for _, id := range kioom.GeneratedAPIIDs() {
+			meta := kioom.GeneratedAPIRegistry[id]
+			if filter != "" && !strings.Contains(strings.ToLower(id), filter) && !strings.Contains(strings.ToLower(meta.Name), filter) {
+				continue
+			}
+			items = append(items, map[string]string{
+				"id": id, "name": meta.Name, "method": meta.MethodName, "path": meta.Path,
+				"request_type": meta.RequestType, "response_type": meta.ResponseType,
+			})
+		}
+		return nil, map[string]any{"count": len(items), "apis": items}, nil
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "api_call",
+		Description: "Invoke any generated stock/ETF/US API by TR code (api_id) with a JSON request object.",
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in struct {
+		APIID   string          `json:"api_id" jsonschema:"Kiwoom TR code, e.g. ka10002"`
+		Request json.RawMessage `json:"request"`
+	}) (*mcp.CallToolResult, map[string]any, error) {
+		apiID := strings.ToLower(strings.TrimSpace(in.APIID))
+		if apiID == "" {
+			return nil, nil, fmt.Errorf("api_id is required")
+		}
+		raw, err := c.CallGeneratedAPIJSON(ctx, apiID, in.Request)
+		if err != nil {
+			return nil, nil, err
+		}
+		var out map[string]any
+		if err := json.Unmarshal(raw, &out); err != nil {
+			return nil, nil, err
+		}
+		return nil, out, nil
 	})
 }

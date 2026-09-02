@@ -62,6 +62,7 @@ Any new user-facing capability in the library should land with corresponding upd
 
 -   **Go Modules**: Use `go mod tidy` after adding new dependencies.
 -   **Formatting**: Always run `go fmt ./...` or use an editor that does it automatically.
+-   **Generated APIs**: Stock/ETF/US endpoints are generated from `_ref/kiwoom-rest-api-spec.json` via `go generate` (`cmd/genapis`). Regenerate after spec updates; do not hand-edit `api_generated_*.go` or `api_registry_gen.go`.
 -   **Testing**: Run `go test ./...` frequently to ensure no regressions.
 -   **Documentation**: Use `godoc` style comments.
     ```go

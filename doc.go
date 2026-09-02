@@ -18,4 +18,6 @@
 //	}
 //
 // For more detailed examples, see the cmd/examples directory.
+//
+//go:generate go run ./cmd/genapis
 package kioom

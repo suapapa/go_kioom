@@ -100,6 +100,34 @@ Supported sections/actions:
 - `account number|deposit|balance`
 - `stock basic|indicators|rank|volume-surge|tick-chart|minute-chart|daily-chart|weekly-chart|monthly-chart|yearly-chart`
 - `order buy|sell|modify|cancel`
+- `us-order buy|sell|modify|cancel` (US stocks & ETFs)
+- `us-account open-orders|balance|deposit`
+- `api list|call` (231 generated stock/ETF/US TR endpoints)
+
+## Generated Stock/ETF/US APIs
+
+Beyond hand-crafted commands, `kioom api` exposes every generated Kiwoom TR in `GeneratedAPIRegistry` (domestic stocks, domestic ETF, US stocks/ETF, related account queries).
+
+List TR codes:
+
+```bash
+kioom api list
+kioom api list --filter ka100
+```
+
+Call by TR code:
+
+```bash
+kioom api call ka10002 --json '{"stk_cd":"005930"}'
+```
+
+Inspect request/response fields:
+
+```bash
+kioom schema api.ka10002
+```
+
+Typed Go methods are also available on `kioom.Client` (for example `GetStockBroker`, `GetETFReturnRate`, `GetUSStockCurrentInfo`).
 
 ## Schema Introspection (Strongly Recommended for Agents)
 
@@ -145,6 +173,9 @@ kioom --mock stock basic --json '{"stk_cd":"005930"}'
 
 # 4) Submit buy order
 kioom --mock order buy --json '{"dmst_stex_tp":"KRX","stk_cd":"005930","ord_qty":"1","ord_uv":"0","trde_tp":"3","cond_uv":""}'
+
+# 4b) Submit US stock/ETF buy order (NASDAQ NVDA limit)
+kioom --mock us-order buy --json '{"stex_tp":"ND","stk_cd":"NVDA","ord_qty":"1","ord_uv":"200.00","trde_tp":"00"}'
 
 # 5) Inspect request/response schema
 kioom schema stock.minute-chart
