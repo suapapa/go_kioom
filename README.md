@@ -20,52 +20,65 @@ JSON 입출력과 스키마 조회용 CLI입니다. 설치, 옵션, 오류 코�
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 
-	"github.com/suapapa/go_kioom" // 올바른 임포트 경로로 수정하여 사용하세요
+	"github.com/suapapa/go_kioom"
 )
 
 func main() {
 	appKey := "YOUR_APP_KEY"
 	secretKey := "YOUR_SECRET_KEY"
-	useMock := true // 모의투자 환경 사용 여부
 
-	// 1. 클라이언트 생성
-	client := kioom.NewClient(appKey, secretKey, useMock)
+	// 1. 클라이언트 생성 (모의투자는 WithMockDomain, 토큰 자동 발급은 WithAutoToken)
+	client := kioom.NewClient(appKey, secretKey, kioom.WithAutoToken(), kioom.WithMockDomain())
+	ctx := context.Background()
 
-	// 2. 접근토큰 발급 (자동으로 client.Token에 저장됨)
-	tokenRes, err := client.IssueToken()
-	if err != nil {
-		log.Fatalf("토큰 발급 실패: %v", err)
-	}
-	fmt.Printf("발급된 토큰: %s\n", tokenRes.Token)
-
-	// 3. 계좌번호 조회
-	acctRes, err := client.GetAccountNumber()
+	// 2. 계좌번호 조회
+	acctRes, err := client.GetAccountNumber(ctx)
 	if err != nil {
 		log.Printf("계좌번호 조회 실패: %v", err)
 	} else {
 		fmt.Printf("계좌번호: %s\n", acctRes.AcctNo)
 	}
 
-	// 4. 삼성전자 주식 기본정보 조회
-	stockRes, err := client.GetStockBasicInfo("005930")
+	// 3. 삼성전자 주식 기본정보 조회
+	stockRes, err := client.GetStockBasicInfo(ctx, "005930")
 	if err != nil {
 		log.Printf("주식정보 조회 실패: %v", err)
 	} else {
 		fmt.Printf("주식명: %s, 현재가: %s\n", stockRes.StkNm, stockRes.CurPrc)
 	}
 
-	// 5. 접근토큰 폐기
-	_, err = client.RevokeToken()
-	if err != nil {
+	// 4. 접근토큰 폐기
+	if _, err := client.RevokeToken(ctx); err != nil {
 		log.Printf("토큰 폐기 실패: %v", err)
 	} else {
 		fmt.Println("토큰 폐기 완료")
 	}
 }
 ```
+
+### 유량 제어 (Rate limits)
+
+키움 REST API는 TR별로 초당 호출 수를 제한합니다. `go_kioom`은 제한이 공지된 TR을 클라이언트에서 자동으로 조절하므로, 루프나 여러 고루틴에서 호출해도 유량제어 오류를 피할 수 있습니다.
+
+- `kt00018` (계좌평가잔고내역요청, `GetAccountBalance`): **초당 3회** — 2026-10-29 18:00 KST부터 초당 5회에서 3회로 강화
+- 그 외 TR: 별도 제한 없음(서버 제한에 따름)
+
+```go
+// 기본값 사용 (kt00018은 초당 3회로 자동 조절)
+client := kioom.NewClient(appKey, secretKey, kioom.WithAutoToken())
+
+// 특정 TR의 제한을 직접 지정
+client = kioom.NewClient(appKey, secretKey, kioom.WithRateLimit("ka10001", 5))
+
+// 호출 측에서 이미 조절 중이라면 클라이언트 제한 해제
+client = kioom.NewClient(appKey, secretKey, kioom.WithoutRateLimit())
+```
+
+클라이언트 하나를 공유하면 동시 호출에도 제한이 함께 적용됩니다. 대기 중 `ctx`가 취소되면 `context.Canceled`/`context.DeadlineExceeded`가 반환됩니다.
 
 ### 예제 (Examples)
 

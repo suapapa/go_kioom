@@ -27,6 +27,11 @@ type Client struct {
 	tokenMu        sync.Mutex
 
 	autoToken bool
+
+	rateMu            sync.Mutex
+	rateLimits        map[string]int
+	rateLimiters      map[string]*rateLimiter
+	rateLimitDisabled bool
 }
 
 // Option is a functional option for configuring the Client.
@@ -62,7 +67,13 @@ func NewClient(appKey, secretKey string, opts ...Option) *Client {
 		httpClient: &http.Client{
 			Timeout: 30 * time.Second,
 		},
-		token: os.Getenv("KIOOM_TOKEN"),
+		token:        os.Getenv("KIOOM_TOKEN"),
+		rateLimits:   make(map[string]int, len(defaultRateLimits)),
+		rateLimiters: make(map[string]*rateLimiter),
+	}
+
+	for apiID, perSecond := range defaultRateLimits {
+		c.rateLimits[apiID] = perSecond
 	}
 
 	for _, opt := range opts {
@@ -148,6 +159,10 @@ func (c *Client) do(req *http.Request, v interface{}) error {
 }
 
 func (c *Client) doOnce(req *http.Request, v interface{}, retried bool) error {
+	if err := c.waitRateLimit(req.Context(), req.Header.Get("api-id")); err != nil {
+		return err
+	}
+
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("do request: %w", err)
